@@ -3,24 +3,19 @@
 session_start();
 
 // Include the database connection
-require 'database.php'; // This file contains the MySQLi connection
-
-// Check if the user is logged in (adjust as per your session structure)
-
-
-// Get the logged-in user's ID
-$userid = $_SESSION['userid'];
-
+require('database.php'); // This file contains the MySQLi connection
+require('functions.php');
+storeInSession(base64_decode($_COOKIE["id"]));
 // Retrieve the current description from the database to display it
-$stmt = $conn->prepare("SELECT description FROM user WHERE userid = ?");
-$stmt->bind_param('i', $userid); // 'i' for integer
+$stmt = $conn->prepare("SELECT udescription FROM users WHERE uid = ?");
+$stmt->bind_param('i', $_COOKIE["id"]); // 'i' for integer
 $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
 // If the user exists, display the form with their current description
 if ($user) {
-    $current_description = htmlspecialchars($user['description']);
+    $current_description = htmlspecialchars($user['udescription']);
 } else {
     $current_description = '';
 }
@@ -45,7 +40,7 @@ if ($user) {
             <img src="images/cover-pic.png" width="100%"> <!----- mn l db ---->
             <div class="profile-container-inner">
                 <img src="images/user-1.png" class="profile-pic"> <!----- mn l db ---->
-                <h1>Username</h1> <!----- mn l db ---->
+                <?php echo '<h1>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h1>'?> <!----- mn l db ---->
                 <b>Title</b> <!----- mn l db ---->
                 <div class="mutual-connections">
                     <img src="images/user-2.png">  <!------ mn l db ------>

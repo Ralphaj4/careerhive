@@ -39,6 +39,7 @@ h2 {
 /* Input field styling */
 .input-group {
     margin-bottom: 15px;
+    height: 10em;
     text-align: left;
 }
 

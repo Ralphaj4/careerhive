@@ -7,7 +7,7 @@
 <body>
 <nav class="navbar">
     <div class="navbar-left">
-        <a href="index.php" class="logo"><img src="images/logo.png"></a>
+        <a href="home.php" class="logo"><img src="images/logo.png"></a>
 
         <div class="search-box">
             <img src="images/search.png" >
@@ -17,7 +17,7 @@
     </div>
     <div class="navbar-center">
         <ul>
-            <li><a href="index.php" class="active-link"><img src="images/home.png"><span>Home</span></a></li>
+            <li><a href="home.php" class="active-link"><img src="images/home.png"><span>Home</span></a></li>
             <li><a href="#"><img src="images/network.png"><span>My Network</span></a></li>
             <li><a href="#"><img src="images/jobs.png"><span>Jobs</span></a></li>
             <li><a href="#"><img src="images/message.png"><span>Messaging</span></a></li>
@@ -36,7 +36,7 @@
             <div class="user-info">
                 <img src="images/user-1.png">
                 <div>
-                    <h3>Username</h3>
+                <?php echo '<h4>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h4>'?>
                     <a href="profile.php">See your profile</a>
                 </div>
             </div>
@@ -56,7 +56,7 @@
                 <p>Help & Support</p>
                 <span>></span>
             </a>
-            <a href="login.php" class="profile-menu-link">
+            <a href="logout.php" class="profile-menu-link">
                 <img src="images/logout.png">
                 <p>Logout</p>
                 <span>></span>

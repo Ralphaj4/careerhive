@@ -3,7 +3,7 @@
 session_start();
 
 // Include the database connection
-require 'database.php'; // Make sure this file includes the MySQLi connection
+require('database.php'); // Make sure this file includes the MySQLi connection
 
 // Check if the user is logged in (adjust as per your session structure)
 

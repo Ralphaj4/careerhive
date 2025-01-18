@@ -1,20 +1,16 @@
 <?php
 // Include database connection file
-include("database.php");
-
-session_start();
+require("database.php");
 $errorMessage = "";
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get the user input
-    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_STRING);
     $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
-
-    // Validate username and password
-    if (!empty($username) && !empty($password)) {
+    // Validate email and password
+    if (!empty($email) && !empty($password)) {
         // Prepare a statement to prevent SQL injection
-        $stmt = $conn->prepare("SELECT password FROM user WHERE username = ?");
-        $stmt->bind_param("s", $username);
+        $stmt = $conn->prepare("SELECT upass FROM users WHERE uemail = ?");
+        $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->bind_result($hashedPassword);
         $stmt->fetch();
@@ -22,15 +18,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Verify the password
         if ($hashedPassword && password_verify($password, $hashedPassword)) {
+            session_start();
             // Login success: start session and redirect to dashboard
-            $_SESSION['username'] = $username;
-            header("Location: index.php");
-            exit;
-        } else {
-            $errorMessage = "Invalid username or password.";
+            $_SESSION['uemail'] = $email;
+            $getUID = $conn->prepare("SELECT uid from users WHERE uemail = ?");
+            $getUID->bind_param("s", $email);
+            if($getUID->execute()){
+                $getUID->bind_result($uid);
+                $getUID->fetch();
+                $getUID->close();
+                $cookieExpire = time() + (60 * 24 * 60 * 60);
+                setcookie("id",base64_encode($uid), $cookieExpire, "/");
+                $_SESSION["fname"] = $user["fname"];
+                $_SESSION["lname"] = $user["lname"];
+                $_SESSION["uemail"] = $email;
+                header("Location: home.php");
+                exit;
+            }
         }
+            
     } else {
-        $errorMessage = "Both fields are required.";
+            $errorMessage = "Invalid email or password.";
     }
 }
 ?>
@@ -49,8 +57,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h2>Login</h2>
         <form method="POST" action="login.php">
             <div class="input-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                <label for="email">Email</label>
+                <input type="text" id="email" name="email" placeholder="Enter your email" required>
             </div>
             <div class="input-group">
                 <label for="password">Password</label>
