@@ -1,3 +1,11 @@
+<?php 
+if(!isset($_COOKIE['id'])){
+    header("Location: index.php");
+    exit;
+}
+require_once('functions.php');
+$user_image = getUserImage(base64_decode($_COOKIE['id']));
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,7 +34,7 @@
     </div>
     <div class="navbar-right">
         <div class="online">
-        <img src="images/user-1.png" class="nav-profile-img" onclick="toggleMenu()">
+        <?php echo '<img class="nav-profile-img" onclick="toggleMenu()" src="data:image/jpeg;base64,' . base64_encode($user_image) . '" alt="" />'; ?> 
         </div>
     </div>
 <!------- profile drop down menu ------>
@@ -34,7 +42,7 @@
     <div class="profile-menu-wrap" id="profileMenu">
         <div class="profile-menu">
             <div class="user-info">
-                <img src="images/user-1.png">
+                <?php echo '<img src="data:image/jpeg;base64,' . base64_encode($user_image) . '" alt="" />'; ?>
                 <div>
                 <?php echo '<h4>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h4>'?>
                     <a href="myprofile.php">See your profile</a>

@@ -1,3 +1,10 @@
+<?php 
+if(!isset($_COOKIE['id'])){
+    header("Location: index.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,17 +23,17 @@ storeInSession(base64_decode($_COOKIE["id"]));
 require('navbar.php');
 require('database.php');
 $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
-
+$posts = RetrievePosts(base64_decode($_COOKIE['id']));
+$user_image = getUserImage(base64_decode($_COOKIE['id']));
 ?>
-<!------- navbar end------->
+
 
 <div class="container">
-    <!------- left sidebar ------->
     <div class="left-sidebar">
         <div class="sidebar-profile-box">
             <img src="images/cover-pic.png" width="100%"> <!---- hon fina n7ot l cover pic lal user l howe bina2iha---->
             <div class="sidebar-profile-info">
-                <img src="images/user-1.png">    <!---- hon fina n7ot soret l user l 3amel login ---->
+                <?php echo '<img src="data:image/jpeg;base64,' . base64_encode($user_image) . '" alt="" />'; ?>    <!---- hon fina n7ot soret l user l 3amel login ---->
                 <?php echo '<h1>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h1>'?>
                 <?php echo '<h3>'.$_SESSION["title"].'</h3>'?>
                 <ul>
@@ -57,52 +64,54 @@ $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
         </div>
     </div>
 
-    <!------- main content ------->
+    <!------- posts ------->
     <div class="main-content">
-        
+        <form id="textForm" method="post">
         <div class="create-post">
-            <div class="create-post-input">
-                <img src="images/user-1.png">
-                <textarea rows="2" placeholder="What's on your mind"></textarea>
-            </div>
+        <div class="create-post-input">
+            <?php echo '<img src="data:image/jpeg;base64,' . base64_encode($user_image) . '" alt="" />'; ?>
+            <textarea id="userInput" name="userInput" rows="3" placeholder="What's on your mind"></textarea>
+        </div>
             <div class="create-post-links">
                 <li><img src="images/photo.png">Photo</li>
                 <li><img src="images/video.png">Video</li>
                 <li><img src="images/event.png">Event</li>
-                <li>Post</li>
+                <button type="submit" id="submitBtn"><li>Post</li></button>
             </div>
         </div>
+        </form>
+        
 
         <div class="sort-by">
             <hr>
             <p>Sort by: <span>top <img src="images/down-arrow.png"></span></p>
         </div>
         
-        <div class="post">
-            <div class="post-author">
-                <img src="images/ralph.jpg"> <!---- image l user mn l db ---->
-                <div>
-                    <h1>_@j</h1>  <!---- name mn l db ---->
-                    <small>Founder and CEO of Pornhub | 9/11 Investor</small>  <!---- l title mn l db ---->
-                    <small>Post time</small> <!---- post time mn l db ----> 
-                </div>
-            </div>
-            <p>The post text that the user uploaded</p> <!------ mn l db ---->
-            <img src="images/post-image-1.png" width="100%"> <!--- l image yale na2a ya3mila post l user aw l video --->
-
+        <?php 
+            foreach ($posts as $row) {
+                echo '<div class="post">';
+                    echo '<div class="post-author">';
+                        echo '<img src="data:image/jpeg;base64,' . base64_encode($row['uimage']) . '" alt="">';
+                        echo '<div>';
+                            echo '<h1>' . htmlspecialchars($row['ufname']) . ' ' . htmlspecialchars($row['ulname']) . '</h1>';
+                            echo '<small>' . htmlspecialchars($row['utitle']) . '</small>';
+                            echo '<small>' . htmlspecialchars($row['pcreation']) . '</small>';
+                        echo '</div>';
+                    echo '</div>';
+                    echo '<p>'. htmlspecialchars($row['ptext']). '</p>';
+                    #HERE IS THE MEDIA OF THE POST
+                echo '<!-- <img src="images/post-image-2.png" width="100%"> --> <!--- l image yale na2a ya3mila post l user aw l video --->
             <div class="post-stats">
                 <div>
                     <img src="images/thumbsup.png">
                     <img src="images/love.png">
                     <img src="images/clap.png">
-                    <span class="liked-users">Name of a user and x others</span>  <!---- hon l name of user howe esem 7ayala user 3ml like w l x hiye l total number of people l 3mlo ---->
+                    <span class="liked-users">' . $row['like_count'] . ' likes</span>  <!---- hon l name of user howe esem 7ayala user 3ml like w l x hiye l total number of people l 3mlo ---->
                 </div>
                 <div>
-                    <span>x comments &middot; y shares</span> <!---- kamen hon l number of comments w shares howe l number of elements l bel db ---->
-
+                    <span>'. $row['comment_count'].' comments &middot; y shares</span> <!---- kamen hon l number of comments w shares howe l number of elements l bel db ---->
                 </div>
             </div>
-
             <div class="post-activity">
                 <div>
                     <img src="images/user-1.png" class="post-activity-user-icon">
@@ -124,60 +133,15 @@ $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
                     <img src="images/send.png">
                     <span>Send</span>
                 </div>
-            </div>
+            </div>';
 
-        </div>
-
-        <div class="post">
-            <div class="post-author">
-                <img src="images/antonio.jpg"> <!---- image l user mn l db ---->
-                <div>
-                    <h1>Tiz l kalb</h1>
-                    <small>Janitor at Lebanese University</small>  <!---- l title mn l db ---->
-                    <small>Post time</small> <!---- post time mn l db ---->
-                </div>
-            </div>
-            <p>The post text that the user uploaded</p>
-            <img src="images/post-image-2.png" width="100%"> <!--- l image yale na2a ya3mila post l user aw l video --->
-
-            <div class="post-stats">
-                <div>
-                    <img src="images/thumbsup.png">
-                    <img src="images/love.png">
-                    <img src="images/clap.png">
-                    <span class="liked-users">Name of a user and x others</span>  <!---- hon l name of user howe esem 7ayala user 3ml like w l x hiye l total number of people l 3mlo ---->
-                </div>
-                <div>
-                    <span>x comments &middot; y shares</span> <!---- kamen hon l number of comments w shares howe l number of elements l bel db ---->
-
-                </div>
-            </div>
-
-            <div class="post-activity">
-                <div>
-                    <img src="images/user-1.png" class="post-activity-user-icon">
-                    <img src="images/down-arrow.png" class="post-activity-arrow-icon">
-                </div>
-                <div class="post-activity-link">
-                    <img src="images/like.png" >
-                    <span>Like</span>
-                </div>
-                <div class="post-activity-link">
-                    <img src="images/comment.png">
-                    <span>Comment</span>
-                </div>
-                <div class="post-activity-link">
-                    <img src="images/share.png">
-                    <span>Share</span>
-                </div>
-                <div class="post-activity-link">
-                    <img src="images/send.png">
-                    <span>Send</span>
-                </div>
-            </div>
-
-        </div> 
+                echo '</div>';
+            }
+            
+        
+        ?>        
     </div>
+
     <!------- right sidebar ------>
     <div class="right-sidebar">
         <div class="sidebar-news">

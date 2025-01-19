@@ -81,6 +81,7 @@ nav.navbar{
 
 .nav-profile-img{
    width: 40px;
+   aspect-ratio: 1 / 1;
    border-radius: 50%;
    display: block;
    cursor: pointer;
@@ -161,6 +162,7 @@ nav.navbar{
 
 .sidebar-profile-info img{
     width: 90px;
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     background: #fff;
     padding: 4px;
@@ -379,6 +381,7 @@ nav.navbar{
 
 .create-post-input img{
     width: 35px;
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     margin-right: 10px;
 }
@@ -399,6 +402,22 @@ nav.navbar{
 .create-post-links{
     display: flex;
     align-items: flex-start;
+}
+
+.create-post-links button{
+    background: #045be6;
+    border: 0;
+    color: white;
+    list-style: none;
+    border-top: 1px solid #ccc ;
+    border-right: 1px solid #ccc;
+    flex-basis: 25%;
+    height: 42px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
 .create-post-links li{
@@ -468,6 +487,7 @@ nav.navbar{
 
 .post-author img{
     width: 35px;
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     margin-right: 10px;
     margin-top: 5px;
@@ -573,6 +593,7 @@ nav.navbar{
 
 .user-info img{
     width:50px;
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     margin-right: 15px;
 }
