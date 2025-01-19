@@ -2,7 +2,7 @@
 
 function storeInSession($id){
     require('database.php');
-    $getuInfo = $conn->prepare("SELECT ufname, ulname, uemail from users WHERE uid = ?");
+    $getuInfo = $conn->prepare("SELECT ufname, ulname, uemail, udescription, utitle from users WHERE uid = ?");
     $getuInfo->bind_param("i", $id);
     if($getuInfo->execute()){
         $userInfo = $getuInfo->get_result();
@@ -11,7 +11,9 @@ function storeInSession($id){
             $userInfo->close();
             $_SESSION["fname"] = $user["ufname"];
             $_SESSION["lname"] = $user["ulname"];
-            $_SESSION["uemail"] = $user["uemail"];
+            $_SESSION["email"] = $user["uemail"];
+            $_SESSION["title"] = $user["utitle"];
+            $_SESSION["description"] = $user["udescription"];
         }
     }
 }

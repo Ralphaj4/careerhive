@@ -5,9 +5,6 @@ session_start();
 // Include the database connection
 require('database.php'); // Make sure this file includes the MySQLi connection
 
-// Check if the user is logged in (adjust as per your session structure)
-
-
 // Get the logged-in user's ID
 $user_id = $_SESSION['userid'];
 
@@ -19,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['description'])) {
     $stmt = $conn->prepare("UPDATE user SET description = ? WHERE userid = ?");
     $stmt->bind_param('si', $description, $userid); // 's' for string, 'i' for integer
     if ($stmt->execute()) {
-        header("Location: profile.php?status=success");
+        header("Location: myprofile.php?status=success");
         exit;
     } else {
         echo "<p>Error updating description: " . $stmt->error . "</p>";

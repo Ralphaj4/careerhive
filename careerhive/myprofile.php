@@ -2,23 +2,12 @@
 // Start the session
 session_start();
 
-// Include the database connection
-require('database.php'); // This file contains the MySQLi connection
+//Include database and functions
+require('database.php');
 require('functions.php');
 storeInSession(base64_decode($_COOKIE["id"]));
-// Retrieve the current description from the database to display it
-$stmt = $conn->prepare("SELECT udescription FROM users WHERE uid = ?");
-$stmt->bind_param('i', $_COOKIE["id"]); // 'i' for integer
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
+$connections = getConnectionCount(base64_decode($_COOKIE["id"]));
 
-// If the user exists, display the form with their current description
-if ($user) {
-    $current_description = htmlspecialchars($user['udescription']);
-} else {
-    $current_description = '';
-}
 ?>
 
 <!DOCTYPE html>
@@ -28,7 +17,7 @@ if ($user) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <title>AssociatedWith</title>
+    <title>CareerHive</title>
 </head>
 <body>
     
@@ -41,10 +30,10 @@ if ($user) {
             <div class="profile-container-inner">
                 <img src="images/user-1.png" class="profile-pic"> <!----- mn l db ---->
                 <?php echo '<h1>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h1>'?> <!----- mn l db ---->
-                <b>Title</b> <!----- mn l db ---->
+                <?php echo '<b>'.$_SESSION["title"].'</b>'?> <!----- mn l db ---->
                 <div class="mutual-connections">
                     <img src="images/user-2.png">  <!------ mn l db ------>
-                    <span>X mutual connections</span>
+                    <span><?php echo $connections ?> connections</span>
                 </div>
                 <div class="profile-btn">
                     <a href="#" class="primary-btn"><img src ="images/connect.png">Connect</a>

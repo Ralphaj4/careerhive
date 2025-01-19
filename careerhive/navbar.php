@@ -37,7 +37,7 @@
                 <img src="images/user-1.png">
                 <div>
                 <?php echo '<h4>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h4>'?>
-                    <a href="profile.php">See your profile</a>
+                    <a href="myprofile.php">See your profile</a>
                 </div>
             </div>
             <hr>

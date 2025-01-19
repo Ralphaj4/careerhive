@@ -28,7 +28,7 @@ $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
             <div class="sidebar-profile-info">
                 <img src="images/user-1.png">    <!---- hon fina n7ot soret l user l 3amel login ---->
                 <?php echo '<h1>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h1>'?>
-                <h3>Title</h3>  <!---- hon mn7ot l title mn l db---->
+                <?php echo '<h3>'.$_SESSION["title"].'</h3>'?>
                 <ul>
                     <li>Your profile views<span>52</span></li>  <!---- l number of views badna nshuf eza 7a n3mlo w kif--->
                     <li>Your post views<span>120</span></li>    <!---- nfs l fkra --->
