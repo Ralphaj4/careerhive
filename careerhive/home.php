@@ -88,17 +88,23 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
         </div>
         
         <?php 
-            foreach ($posts as $row) {
+            foreach ($posts as $post) {
+                if(CheckIfLiked(base64_decode($_COOKIE['id']), $post['pid'])){
+                    $likeButton = 'liked';
+                }
+                else{
+                    $likeButton = 'like';
+                }
                 echo '<div class="post">';
                     echo '<div class="post-author">';
-                        echo '<img src="data:image/jpeg;base64,' . base64_encode($row['uimage']) . '" alt="">';
+                        echo '<img src="data:image/jpeg;base64,' . base64_encode($post['uimage']) . '" alt="">';
                         echo '<div>';
-                            echo '<h1>' . htmlspecialchars($row['ufname']) . ' ' . htmlspecialchars($row['ulname']) . '</h1>';
-                            echo '<small>' . htmlspecialchars($row['utitle']) . '</small>';
-                            echo '<small>' . htmlspecialchars($row['pcreation']) . '</small>';
+                            echo '<h1>' . htmlspecialchars($post['ufname']) . ' ' . htmlspecialchars($post['ulname']) . '</h1>';
+                            echo '<small>' . htmlspecialchars($post['utitle']) . '</small>';
+                            echo '<small>' . htmlspecialchars($post['pcreation']) . '</small>';
                         echo '</div>';
                     echo '</div>';
-                    echo '<p>'. htmlspecialchars($row['ptext']). '</p>';
+                    echo '<p>'. htmlspecialchars($post['ptext']). '</p>';
                     #HERE IS THE MEDIA OF THE POST
                 echo '<!-- <img src="images/post-image-2.png" width="100%"> --> <!--- l image yale na2a ya3mila post l user aw l video --->
             <div class="post-stats">
@@ -106,10 +112,10 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
                     <img src="images/thumbsup.png">
                     <img src="images/love.png">
                     <img src="images/clap.png">
-                    <span class="liked-users">' . $row['like_count'] . ' likes</span>  <!---- hon l name of user howe esem 7ayala user 3ml like w l x hiye l total number of people l 3mlo ---->
+                    <span class="liked-users">' . $post['like_count'] . ' likes</span>  <!---- hon l name of user howe esem 7ayala user 3ml like w l x hiye l total number of people l 3mlo ---->
                 </div>
                 <div>
-                    <span>'. $row['comment_count'].' comments &middot; y shares</span> <!---- kamen hon l number of comments w shares howe l number of elements l bel db ---->
+                    <span>'. $post['comment_count'].' comments &middot; y shares</span> <!---- kamen hon l number of comments w shares howe l number of elements l bel db ---->
                 </div>
             </div>
             <div class="post-activity">
@@ -118,20 +124,20 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
                     <img src="images/down-arrow.png" class="post-activity-arrow-icon">
                 </div>
                 <div class="post-activity-link">
-                    <img src="images/like.png" >
-                    <span>Like</span>
+                    <button id="like" class="like" onClick="toggleImage()" data-postid="'. $post['pid'] .'"><img src="images/'. $likeButton .'.png" id="toggleImage">
+                    <span>Like</span></button>
                 </div>
                 <div class="post-activity-link">
-                    <img src="images/comment.png">
-                    <span>Comment</span>
+                    <button><img src="images/comment.png">
+                    <span>Comment</span></button>
                 </div>
                 <div class="post-activity-link">
-                    <img src="images/share.png">
-                    <span>Share</span>
+                    <button><img src="images/share.png">
+                    <span>Share</span></button>
                 </div>
                 <div class="post-activity-link">
-                    <img src="images/send.png">
-                    <span>Send</span>
+                    <button><img src="images/send.png">
+                    <span>Send</span></button>
                 </div>
             </div>';
 

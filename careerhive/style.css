@@ -564,6 +564,15 @@ nav.navbar{
     margin-right: 8px;
 }
 
+.post-activity-link button{
+    background: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* ----------------- profile drop down menu -------------- */
 .profile-menu-wrap{
     position: absolute;
@@ -733,4 +742,10 @@ nav.navbar{
     resize: none;
     background: white;
     margin-top: 10px;
+}
+
+#toggleImage {
+    width: 18px;
+    height: auto;
+    transition: opacity 0.3s ease;
 }

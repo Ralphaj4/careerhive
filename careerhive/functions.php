@@ -36,7 +36,8 @@ function getConnectionCount($id){
 function RetrievePosts($id){
     require('database.php');
     $stmt = $conn->prepare("SELECT 
-    posts.ptext, 
+    posts.ptext,
+    posts.pid,
     posts.pcreation, 
     users.ufname, 
     users.ulname, 
@@ -84,4 +85,15 @@ function getUserImage($id){
     return $result;
 }
 
+function CheckIfLiked($id, $pid){
+    require('database.php');
+    $liked = $conn->prepare("SELECT COUNT(*) FROM likes JOIN posts ON ? = likes.lpost WHERE luser= ?");
+    $liked->bind_param("ii", $pid, $id);
+    if($liked->execute()){
+        $liked->bind_result($like_count);
+        $liked->fetch();
+        $liked->close();
+        return $like_count;
+    }
+}
 ?>
