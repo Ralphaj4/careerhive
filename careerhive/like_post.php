@@ -15,15 +15,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if(!CheckIfLiked($userid, $postid)){
         $stmt = $conn->prepare("INSERT INTO likes (lpost, luser) VALUES (?, ?)");
+        $status = 'liked';
     }
     else{
         $stmt = $conn->prepare("DELETE FROM likes WHERE lpost = ? AND luser = ?");
+        $status = 'unliked';
     }
     
     $stmt->bind_param('ii', $postid, $userid);
     $stmt->execute();
 
-    echo json_encode(['success' => $stmt->affected_rows > 0]);
+    $response = [
+        'success' => $stmt->affected_rows > 0,
+        'status' => $status
+    ];
+    echo json_encode($response);
     $stmt->close();
     $conn->close();
 

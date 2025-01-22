@@ -25,6 +25,7 @@ require('database.php');
 $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
 $posts = RetrievePosts(base64_decode($_COOKIE['id']));
 $user_image = getUserImage(base64_decode($_COOKIE['id']));
+
 ?>
 
 
@@ -88,6 +89,8 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
         </div>
         
         <?php 
+        if(!empty($posts)){
+            $count = 1;
             foreach ($posts as $post) {
                 if(CheckIfLiked(base64_decode($_COOKIE['id']), $post['pid'])){
                     $likeButton = 'liked';
@@ -106,8 +109,10 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
                     echo '</div>';
                     echo '<p>'. htmlspecialchars($post['ptext']). '</p>';
                     #HERE IS THE MEDIA OF THE POST
-                echo '<!-- <img src="images/post-image-2.png" width="100%"> --> <!--- l image yale na2a ya3mila post l user aw l video --->
-            <div class="post-stats">
+                    if(!empty($post['pimage'])){
+                echo '<img src="data:image/jpeg;base64,' . base64_encode($post['pimage']) . '" alt="" width="100%" />';
+                    }
+                echo '<div class="post-stats">
                 <div>
                     <img src="images/thumbsup.png">
                     <img src="images/love.png">
@@ -115,20 +120,20 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
                     <span class="liked-users">' . $post['like_count'] . ' likes</span>  <!---- hon l name of user howe esem 7ayala user 3ml like w l x hiye l total number of people l 3mlo ---->
                 </div>
                 <div>
-                    <span>'. $post['comment_count'].' comments &middot; y shares</span> <!---- kamen hon l number of comments w shares howe l number of elements l bel db ---->
+                    <span>'. (string)((int)$post['comment_count'] == 1 ? (int)$post['comment_count'] : (int)($post['comment_count']/2)).' comments &middot; y shares</span> <!---- kamen hon l number of comments w shares howe l number of elements l bel db ---->
                 </div>
             </div>
             <div class="post-activity">
                 <div>
-                    <img src="images/user-1.png" class="post-activity-user-icon">
+                    <img src="data:image/jpeg;base64,' . base64_encode($user_image) . '" alt="" class="post-activity-user-icon">
                     <img src="images/down-arrow.png" class="post-activity-arrow-icon">
                 </div>
                 <div class="post-activity-link">
-                    <button id="like" class="like" onClick="toggleImage()" data-postid="'. $post['pid'] .'"><img src="images/'. $likeButton .'.png" id="toggleImage">
+                    <button id="like" class="like" onClick="toggleImage('.$post['pid'].')" data-postid="'. $post['pid'] .'"><img src="images/'. $likeButton .'.png" id="toggleImage'.$post['pid'].'">
                     <span>Like</span></button>
                 </div>
                 <div class="post-activity-link">
-                    <button><img src="images/comment.png">
+                    <button id="showCommentBox'.$count.'" class="comment-post" onClick="showComments('. $count .')" data-postid="'. $post['pid'] .'"><img src="images/comment.png">
                     <span>Comment</span></button>
                 </div>
                 <div class="post-activity-link">
@@ -139,12 +144,26 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
                     <button><img src="images/send.png">
                     <span>Send</span></button>
                 </div>
+                <div id="overlay" class="overlay" style="display: none;"></div>
+                <div id="whiteBox" class="white-box" style="display: none;">
+                    <div class="comments-container">
+                        <p>Comments will appear here...</p>
+                    </div>
+                    <div>
+                    <textarea id="userComment" name="userComment" rows="1" placeholder="Type a comment"></textarea>
+                    <button class="sendComment"><img src="images/send.png"></button>
+                    </div>
+                </div>
             </div>';
 
                 echo '</div>';
+                $count++;
             }
             
-        
+        }
+        else{
+            echo '<div style="display:flex; align-items:center;justify-content: center;height: 70vh;"><h2>No Posts Found</h2></div>';
+        }
         ?>        
     </div>
 

@@ -37,6 +37,7 @@ function RetrievePosts($id){
     require('database.php');
     $stmt = $conn->prepare("SELECT 
     posts.ptext,
+    posts.pimage,
     posts.pid,
     posts.pcreation, 
     users.ufname, 
@@ -96,4 +97,5 @@ function CheckIfLiked($id, $pid){
         return $like_count;
     }
 }
+
 ?>
