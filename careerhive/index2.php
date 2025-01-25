@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-<button id="showCommentBox" data-postid="11">click me</button>
+<button id="showCommentBox" onclick="showComments(11)" data-postid="11">click me</button>
 <div id="commentsContainer"></div>
 <script src="scripts.js"></script>
 </body>

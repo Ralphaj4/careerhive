@@ -99,14 +99,18 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
                     $likeButton = 'like';
                 }
                 echo '<div class="post">';
-                    echo '<div class="post-author">';
+                echo '<div class="post-author">';
+                    echo '<a href="profile.php?id=' . urlencode(base64_encode($post['uid'])) . '">';
                         echo '<img src="data:image/jpeg;base64,' . base64_encode($post['uimage']) . '" alt="">';
-                        echo '<div>';
+                    echo '</a>';
+                    echo '<div>';
+                        echo '<a href="profile.php?id=' . urlencode($post['uid']) . '" style="text-decoration: none; color: inherit;">';
                             echo '<h1>' . htmlspecialchars($post['ufname']) . ' ' . htmlspecialchars($post['ulname']) . '</h1>';
-                            echo '<small>' . htmlspecialchars($post['utitle']) . '</small>';
-                            echo '<small>' . htmlspecialchars($post['pcreation']) . '</small>';
-                        echo '</div>';
-                    echo '</div>';
+                        echo '</a>';
+                    echo '<small>' . htmlspecialchars($post['utitle']) . '</small>';
+                    echo '<small>' . htmlspecialchars($post['pcreation']) . '</small>';
+                echo '</div>';
+            echo '</div>';
                     echo '<p>'. htmlspecialchars($post['ptext']). '</p>';
                     #HERE IS THE MEDIA OF THE POST
                     if(!empty($post['pimage'])){

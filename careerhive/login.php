@@ -1,4 +1,8 @@
 <?php
+if(isset($_COOKIE['id'])){
+    header("Location: home.php");
+    exit;
+}
 // Include database connection file
 require("database.php");
 $errorMessage = "";

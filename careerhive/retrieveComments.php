@@ -1,5 +1,6 @@
 <?php
 require('database.php');
+require_once('functions.php');
 mysqli_set_charset($conn, 'utf8mb4');
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $inputData = file_get_contents("php://input");
@@ -29,12 +30,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
      foreach ($comments as &$comment) {
          foreach ($comment as $key => $value) {
             $comment[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-            if (isset($comment['uimage'])) {
-                $image_base64 = base64_encode($comment['uimage']);
-                unset($comment['uimage']);
-            }
+            $image = getUserImage($comment['uid']);
+            $comment['image'] = base64_encode($image);
          }
      }
+
+    $image = getUserImage($comment['uid']);
      
     //  if (!empty($comments['uimage'])) {
     //     $image = $comments['uimage'];
@@ -42,7 +43,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //'image' => $image_base64,
     $response = [
         'comments' => $comments,
-        
     ];
 
     // Set header for JSON response

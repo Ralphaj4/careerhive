@@ -42,7 +42,8 @@ function RetrievePosts($id){
     posts.pcreation, 
     users.ufname, 
     users.ulname, 
-    users.utitle, 
+    users.utitle,
+    users.uid,
     users.uimage,
     COUNT(comments.cpost) AS comment_count,
     COUNT(likes.lpost) AS like_count
@@ -96,6 +97,17 @@ function CheckIfLiked($id, $pid){
         $liked->close();
         return $like_count;
     }
+}
+
+function gerUserData($id){
+    require('database.php');
+    $stmt = $conn->prepare("SELECT * FROM users WHERE uid = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    return $user;
 }
 
 ?>
