@@ -10,7 +10,7 @@ if(!isset($_COOKIE['id'])){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>CareerHive</title>
 </head>
@@ -35,7 +35,7 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
             <img src="images/cover-pic.png" width="100%"> <!---- hon fina n7ot l cover pic lal user l howe bina2iha---->
             <div class="sidebar-profile-info">
                 <?php echo '<img src="data:image/jpeg;base64,' . base64_encode($user_image) . '" alt="" />'; ?>    <!---- hon fina n7ot soret l user l 3amel login ---->
-                <?php echo '<h1>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h1>'?>
+                <?php echo '<a href="myprofile.php" style="text-decoration: none; color: inherit;"><h1>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h1></a>'?>
                 <?php echo '<h3>'.$_SESSION["title"].'</h3>'?>
                 <ul>
                     <li>Your profile views<span>52</span></li>  <!---- l number of views badna nshuf eza 7a n3mlo w kif--->
@@ -67,20 +67,24 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
 
     <!------- posts ------->
     <div class="main-content">
-        <form id="textForm" method="post">
-        <div class="create-post">
+    <form id="textForm" method="post" enctype="multipart/form-data">
+    <div class="create-post">
         <div class="create-post-input">
             <?php echo '<img src="data:image/jpeg;base64,' . base64_encode($user_image) . '" alt="" />'; ?>
             <textarea id="userInput" name="userInput" rows="3" placeholder="What's on your mind"></textarea>
+            <div id="mediaPreview"></div>
         </div>
-            <div class="create-post-links">
-                <li><img src="images/photo.png">Photo</li>
-                <li><img src="images/video.png">Video</li>
-                <li><img src="images/event.png">Event</li>
-                <button type="submit" id="submitBtn"><li>Post</li></button>
-            </div>
+        <div class="create-post-links">
+            <li id="photoButton"><img src="images/photo.png"> Photo</li>
+            <li><img src="images/video.png"> Video</li>
+            <li><img src="images/event.png"> Event</li>
+            <button type="submit" id="submitBtn"><li>Post</li></button>
         </div>
-        </form>
+        <!-- Hidden File Input -->
+        <input type="file" id="photoInput" name="photoInput" accept="image/*" style="display: none;">
+    </div>
+</form>
+
         
 
         <div class="sort-by">
@@ -104,7 +108,7 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
                         echo '<img src="data:image/jpeg;base64,' . base64_encode($post['uimage']) . '" alt="">';
                     echo '</a>';
                     echo '<div>';
-                        echo '<a href="profile.php?id=' . urlencode($post['uid']) . '" style="text-decoration: none; color: inherit;">';
+                        echo '<a href="profile.php?id=' . urlencode(base64_encode($post['uid'])) . '" style="text-decoration: none; color: inherit;">';
                             echo '<h1>' . htmlspecialchars($post['ufname']) . ' ' . htmlspecialchars($post['ulname']) . '</h1>';
                         echo '</a>';
                     echo '<small>' . htmlspecialchars($post['utitle']) . '</small>';
@@ -137,7 +141,7 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
                     <span>Like</span></button>
                 </div>
                 <div class="post-activity-link">
-                    <button id="showCommentBox'.$count.'" class="comment-post" onClick="showComments('. $count .')" data-postid="'. $post['pid'] .'"><img src="images/comment.png">
+                    <button id="showCommentBox'.$count.'" class="comment-post" onClick="showComments('. $count .','.$post['pid'].')" data-postid="'. $post['pid'] .'"><img src="images/comment.png">
                     <span>Comment</span></button>
                 </div>
                 <div class="post-activity-link">
@@ -150,12 +154,17 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
                 </div>
                 <div id="overlay" class="overlay" style="display: none;"></div>
                 <div id="whiteBox" class="white-box" style="display: none;">
+                    <div>
+                        <button id="close-Comments" class="close-Comments">
+                            <p>X</p>    
+                        </button>
+                    </div>
                     <div class="comments-container">
                         <p>Comments will appear here...</p>
                     </div>
                     <div>
                     <textarea id="userComment" name="userComment" rows="1" placeholder="Type a comment"></textarea>
-                    <button class="sendComment"><img src="images/send.png"></button>
+                    <button id="sendComment'. $post['pid'] .'" class="sendComment" onClick="postComment('.$post['pid'].')"><img src="images/send.png"></button>
                     </div>
                 </div>
             </div>';

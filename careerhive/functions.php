@@ -99,13 +99,13 @@ function CheckIfLiked($id, $pid){
     }
 }
 
-function gerUserData($id){
+function getUserData($id){
     require('database.php');
     $stmt = $conn->prepare("SELECT * FROM users WHERE uid = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $result = $stmt->get_result();
-    $user = $result->fetch_all(MYSQLI_ASSOC);
+    $user = $result->fetch_assoc();
     $stmt->close();
     return $user;
 }

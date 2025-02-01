@@ -1,7 +1,7 @@
 <?php
 require('database.php');
-require_once('functions.php');
 mysqli_set_charset($conn, 'utf8mb4');
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $inputData = file_get_contents("php://input");
     
@@ -29,18 +29,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
      foreach ($comments as &$comment) {
          foreach ($comment as $key => $value) {
+            if (isset($comment['uimage']) && $comment[$key] == $comment['uimage']) {
+                //unset($comment[$key]);
+                $comment['uimage'] = base64_encode($comment['uimage']);
+                continue;
+            }
             $comment[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-            $image = getUserImage($comment['uid']);
-            $comment['image'] = base64_encode($image);
+            //$image = getUserImage($comment['uid']);
+            //$comment['image'] = base64_encode($image);
+            
          }
      }
 
-    $image = getUserImage($comment['uid']);
-     
-    //  if (!empty($comments['uimage'])) {
-    //     $image = $comments['uimage'];
-    // }
-    //'image' => $image_base64,
+    //$image = getUserImage($comment['uid']);
+
     $response = [
         'comments' => $comments,
     ];
@@ -48,25 +50,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Set header for JSON response
     header('Content-Type: application/json');
     echo json_encode($response);
-    // echo json_encode([
-    //     'uid' => $comments[0],
-    //     'message' => json_last_error_msg()
-    // ]);
 
-    // Encode to JSON with error handling
-    // $json = json_encode($comments ?: []);
-    // if ($json === false) {
-    //     // Handle JSON encoding error
-    //     echo json_encode([
-    //         'error' => 'JSON encoding error',
-    //         'message' => json_last_error_msg()
-    //     ]);
-    //     exit;
-    // }
-
-    //echo $json; // Output the JSON response
-// } else {
-//     header('Content-Type: application/json; charset=utf-8');
-//     echo json_encode([]); // Return empty array for invalid requests
 }
 ?>

@@ -19,7 +19,8 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
 
         <div class="search-box">
             <img src="images/search.png" >
-            <input type="text" placeholder="Search">
+            <input type="text" placeholder="Search" id="searchInput">
+            <span><button id="search" class="search">s</button></span>
         </div>
 
     </div>
@@ -73,5 +74,6 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
     </div>
 
 </nav>
+<!-- <script src="scriptSearch.js"></script> -->
 </body>
 </html>

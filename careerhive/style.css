@@ -790,17 +790,12 @@ nav.navbar{
     transition: opacity 0.3s ease; /* Smooth fade-in/out transition */
 }
 
-.comments-container {
-    flex: 1; /* Allow comments to take up all available space */
-    overflow-y: auto; /* Enable scroll if comments overflow */
-}
-
 #userComment {
     position: absolute;
     bottom: 15px; /* Position 10px above the bottom */
     left: 20px;
     right: 20px;
-    height: 40px; /* Set fixed height */
+    height: 7vh; /* Set fixed height */
     resize: none; /* Disable resizing (arrows in the corner) */
     overflow: hidden; /* Hide any scrolling */
     padding: 10px;
@@ -829,3 +824,91 @@ nav.navbar{
     outline: none; /* Remove the default blue outline on focus */
 }
 
+.close-Comments{
+    position: absolute;
+    top:0;
+    right:0;
+    padding:25px;
+    font-size:12px;
+    cursor:pointer;
+    border:none;
+    background:transparent;
+}
+
+#white-Box.closed {
+    opacity: 0; /* Makes the box invisible */
+    pointer-events: none;
+  }
+
+
+
+  .comments-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    height: 70vh; /* Fixed height for scrollable area */
+    border-radius: 8px;
+    overflow-y: scroll; /* Always enable vertical scrolling */
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Hide the scrollbar while keeping scrolling enabled */
+.comments-container::-webkit-scrollbar {
+    display: none; /* Hides the scrollbar in WebKit-based browsers (Chrome, Safari, etc.) */
+}
+
+.comments-container {
+    -ms-overflow-style: none;  /* Hides the scrollbar in IE and Edge */
+    scrollbar-width: none;  /* Hides the scrollbar in Firefox */
+}
+
+
+
+.comment {
+    border-bottom: 1px solid #ddd;
+    padding: 15px;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+    width: 95%;
+    margin-left: 10px;
+}
+
+.comment-header {
+    display: flex;
+    align-items: left;
+    gap: 10px;
+}
+
+.comment img {
+    width: 40px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-header div {
+    display: flex;
+    flex-direction: column;
+}
+
+.comment strong {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.comment small {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.comment p {
+    margin: 0;
+    font-size: 1em;
+    padding-top: 10px;
+}

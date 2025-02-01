@@ -1,13 +1,16 @@
 <?php
 require('database.php');
 
-// Capture the textarea value
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $userInput = $_POST['userInput'];
+    $inputData = file_get_contents("php://input");
+    $data = json_decode($inputData, true);
+
+    $userInput = $data['userComment'];
+    $pid = $data['postId'];
     $decoded_Cookie = base64_decode($_COOKIE["id"]);
     // Prepare and bind the SQL statement
-    $stmt = $conn->prepare("INSERT INTO posts (pauthor, ptext) VALUES (?, ?)");
-    $stmt->bind_param("is", $decoded_Cookie, $userInput);
+    $stmt = $conn->prepare("INSERT INTO comments (cpost, cuser, text) VALUES (?, ?, ?)");
+    $stmt->bind_param("iis", $pid, $decoded_Cookie, $userInput);
 
     // Execute the statement
     if ($stmt->execute()) {
