@@ -31,20 +31,20 @@ echo '
         <div class="profile-container">
             <img src="images/cover-pic.png" alt="Cover Picture" width="100%">
             <div class="profile-container-inner">
-                <img src="data:image/jpeg;base64,' . base64_encode($user['uimage']) . '" alt="Profile Image" class="profile-pic">
+                <img src="' . $user['uimage'] . '" alt="Profile Image" class="profile-pic">
                 <h1>' . htmlspecialchars($user['ufname']) . ' ' . htmlspecialchars($user['ulname']) . '</h1>
                 <b>' . htmlspecialchars($user['utitle']) . '</b>
                 <div class="mutual-connections">
-                    <img src="data:image/jpeg;base64,' . base64_encode($user['uimage']) . '" alt="Profile Image">
+                    <img src="' . $user['uimage'] . '" alt="Profile Image">
                     <span>' . htmlspecialchars($connections) . ' connections</span>
                 </div>
                 <div class="profile-btn">
-                    <a href="#" class="primary-btn">
+                    <button class="primary-btn" ' . (true ? 'onclick="sendConnectionInProfile()"' : '') . '>
                         <img src="images/connect.png" alt="Connect Icon"> Connect
-                    </a>
-                    <a href="#">
+                    </button>
+                    <button>
                         <img src="images/chat.png" alt="Chat Icon"> Message
-                    </a>
+                    </buttons>
                 </div>
             </div>
         </div>

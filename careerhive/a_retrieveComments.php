@@ -16,7 +16,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ON
             users.uid = comments.cuser
         WHERE
-            comments.cpost = ?");
+            comments.cpost = ?
+        ORDER BY
+            comments.ctime DESC");
     $stmt->bind_param("i", $pid);
     if (!$stmt->execute()) {
         echo json_encode(['error' => 'Database error: ' . $stmt->error]);
@@ -29,14 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
      foreach ($comments as &$comment) {
          foreach ($comment as $key => $value) {
-            if (isset($comment['uimage']) && $comment[$key] == $comment['uimage']) {
-                //unset($comment[$key]);
-                $comment['uimage'] = base64_encode($comment['uimage']);
-                continue;
-            }
             $comment[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-            //$image = getUserImage($comment['uid']);
-            //$comment['image'] = base64_encode($image);
             
          }
      }

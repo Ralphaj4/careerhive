@@ -23,6 +23,7 @@ storeInSession(base64_decode($_COOKIE["id"]));
 require('navbar.php');
 require('database.php');
 $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
+$user_image = getUserImage(base64_decode($_COOKIE['id']));
 
 ?>
 
@@ -32,7 +33,7 @@ $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
         <div class="sidebar-profile-box">
             <img src="images/cover-pic.png" width="100%"> <!---- hon fina n7ot l cover pic lal user l howe bina2iha---->
             <div class="sidebar-profile-info">
-                <?php echo '<img src="' . $_SESSION['uimage'] . '" alt="" />'; ?>    <!---- hon fina n7ot soret l user l 3amel login ---->
+                <?php echo '<img src="data:image/jpeg;base64,' . base64_encode($user_image) . '" alt="" />'; ?>    <!---- hon fina n7ot soret l user l 3amel login ---->
                 <?php echo '<a href="myprofile.php" style="text-decoration: none; color: inherit;"><h1>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h1></a>'?>
                 <?php echo '<h3>'.$_SESSION["title"].'</h3>'?>
                 <ul>
@@ -68,7 +69,7 @@ $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
     <form id="textForm" method="post" enctype="multipart/form-data">
     <div class="create-post">
         <div class="create-post-input">
-            <?php echo '<img src="' . $_SESSION['uimage'] . '" alt="" />'; ?>
+            <?php echo '<img src="data:image/jpeg;base64,' . base64_encode($user_image) . '" alt="" />'; ?>
             <textarea id="userInput" name="userInput" rows="3" placeholder="What's on your mind"></textarea>
             <div id="mediaPreview"></div>
         </div>
@@ -134,7 +135,7 @@ $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
     </div>
 </div>
 
-<script src="scripts.js"></script>
+<script src="script2.js"></script>
 
 </body>
 </html>

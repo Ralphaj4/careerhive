@@ -1,7 +1,7 @@
-let profileMenu = document.getElementById("profileMenu");
-
-function toggleMenu(){
-    profileMenu.classList.toggle("open-menu");
+function sanitize(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 
@@ -9,6 +9,102 @@ document.addEventListener('DOMContentLoaded', function () {
   const submitButton = document.getElementById('submitBtn');
   const userInputField = document.getElementById('userInput');
   const photoInput = document.getElementById('photoInput');
+
+
+    fetch('a_fetchPost.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+  })
+  .then(response => response.json())
+  .then(data => {
+          const postsContainer = document.getElementById('posts-container');
+          postsContainer.innerHTML = '';
+
+          if (data.posts.length > 0) {
+            let count = 1;
+        
+            data.posts.forEach((post) => {
+                let likeButton = post.is_liked === "liked" ? "liked" : "like"; // Simulating PHP's CheckIfLiked
+        
+                const postElement = document.createElement("div");
+                postElement.classList.add("post");
+        
+                postElement.innerHTML = `
+                    <div class="post-author">
+                        <a href="profile.php?id=${encodeURIComponent(btoa(post.uid))}">
+                            <img src="${post.uimage}" alt="">
+                        </a>
+                        <div>
+                            <a href="profile.php?id=${encodeURIComponent(btoa(post.uid))}" style="text-decoration: none; color: inherit;">
+                                <h1>${sanitize(post.ufname)} ${sanitize(post.ulname)}</h1>
+                            </a>
+                            <small>${sanitize(post.utitle)}</small>
+                            <small>${sanitize(post.pcreation)}</small>
+                        </div>
+                    </div>
+                    <p>${sanitize(post.ptext)}</p>
+                    ${post.pimage ? `<img src="${post.pimage}" alt="" width="100%" />` : ""}
+                    
+                    <div class="post-stats">
+                        <div>
+                            <img src="images/thumbsup.png">
+                            <img src="images/love.png">
+                            <img src="images/clap.png">
+                            <span class="liked-users">${post.like_count} likes</span>
+                        </div>
+                        <div>
+                            <span>${post.comment_count} comments &middot; y shares</span>
+                        </div>
+                    </div>
+                    
+                    <div class="post-activity">
+                        <div>
+                            <img src="${post.uimage}" alt="" class="post-activity-user-icon">
+                            <img src="images/down-arrow.png" class="post-activity-arrow-icon">
+                        </div>
+                        <div class="post-activity-link">
+                            <button id="like" class="like" onClick="toggleImage(${post.pid})" data-postid="${post.pid}">
+                                <img src="images/${likeButton}.png" id="toggleImage${post.pid}">
+                                <span>Like</span>
+                            </button>
+                        </div>
+                        <div class="post-activity-link">
+                            <button id="showCommentBox${count}" class="comment-post" onClick="showComments(${count},${post.pid})" data-postid="${post.pid}">
+                                <img src="images/comment.png">
+                                <span>Comment</span>
+                            </button>
+                        </div>
+                        <div class="post-activity-link">
+                            <button><img src="images/share.png"><span>Share</span></button>
+                        </div>
+                        <div class="post-activity-link">
+                            <button><img src="images/send.png"><span>Send</span></button>
+                        </div>
+                        
+                        <div id="overlay" class="overlay" style="display: none;"></div>
+                        <div id="whiteBox" class="white-box" style="display: none;">
+                            <div>
+                                <button id="close-Comments" class="close-Comments" onClick="toggleVisibility(false, 0, 0)"><p>X</p></button>
+                            </div>
+                            <div class="comments-container">
+                                <p>Comments will appear here...</p>
+                            </div>
+                            <div>
+                                <textarea id="userComment" name="userComment" rows="1" placeholder="Type a comment"></textarea>
+                                <button id="sendComment${post.pid}" class="sendComment" onClick="postComment(${post.pid})"><img src="images/send.png"></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        
+                postsContainer.appendChild(postElement);
+                count++;
+            });
+        } else {
+            postsContainer.innerHTML = '<div style="display:flex; align-items:center;justify-content: center;height: 70vh;"><h2>No Posts Found</h2></div>';
+        }
+  })
+  .catch(error => console.error('Error fetching posts:', error));
 
   submitButton.addEventListener('click', function (event) {
       event.preventDefault(); // Prevent default form submission
@@ -39,8 +135,8 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-  function toggleImage(x) {
-    var img = document.getElementById('toggleImage' + x);
+  function toggleImage(pid) {
+    var img = document.getElementById('toggleImage' + pid);
     img.style.opacity = 0; // Fade out the image
     
     // Wait until the image fades out before switching the source
@@ -52,144 +148,89 @@ document.addEventListener('DOMContentLoaded', function () {
       
       // Fade the image back in after switching the source
       img.style.opacity = 1;
-    }, 150);    }
+    }, 150);    
+    likePost(pid);
+  }
 
 
-    
-  
-  
-
-
-document.querySelectorAll('.like').forEach(button => {
-    button.addEventListener('click', function () {
-        const postId = this.dataset.postid;
-
+function likePost(pid){
         fetch('a_likePost.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ postid: postId })
+            body: JSON.stringify({ postid: pid })
         })
         .then(response => response.json())
         .then(data => {
+          console.log("clicked");
         })
         .catch(console.error);
-    });
-});
+}
+ 
 
-const whiteBox = document.getElementById('whiteBox');
-const overlay = document.getElementById('overlay');
+function getComments(id, pid) {
+  const button = document.getElementById('showCommentBox' + id);
 
-// function showComments(id){
-//     // Get the white box and overlay element
-    
-//     getComments(id);
-//     // Function to show or hide the white box and overlay with transition
-//     const toggleVisibility = () => {
-//         if (whiteBox.style.display === 'none' || whiteBox.style.display === '') {
-//             // Show the white box and overlay with transition
-//             whiteBox.style.display = 'block'; // Make the box visible
-//             overlay.style.display = 'block';  // Make the overlay visible
-  
-//             // Trigger the transition by setting opacity and transform
-//             setTimeout(() => {
-//                 whiteBox.style.opacity = '1';
-//                 whiteBox.style.transform = 'translateX(-50%) translateY(0)'; // Slide into position
-//                 overlay.style.opacity = '1'; // Fade in the overlay
-//             }, 10); // Delay to allow the box to be shown first
-//         } else {
-//             // Hide the white box and overlay with transition
-//             whiteBox.style.opacity = '0';
-//             whiteBox.style.transform = 'translateX(-50%) translateY(-30px)'; // Slide out of view
-//             overlay.style.opacity = '0'; // Fade out the overlay
-  
-//             // After the transition ends, hide the box and overlay
-//             setTimeout(() => {
-//                 whiteBox.style.display = 'none'; // Hide the white box
-//                 overlay.style.display = 'none';  // Hide the overlay
-//             }, 300); // Match the duration of the transition
-//         }
-//     };
-  
-//     // Add click event listener to toggle visibility of the white box and overlay
-//     document.addEventListener('click', function(event) {
-//         // Check if the click was outside the white box and overlay
-//         if (!whiteBox.contains(event.target) && !overlay.contains(event.target)) {
-//             toggleVisibility();
-//         }
-//     });
-  
-//     // Prevent the white box from hiding when clicking inside it
-//     whiteBox.addEventListener('click', function(event) {
-//         event.stopPropagation(); // Prevent the click event from bubbling up to the document
-//     });
-//   }
-  
+  fetch('a_retrieveComments.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ commentbtn: pid }),
+  })
+      .then(response => response.json())
+      .then(data => {
+          const comments = data.comments;
+          const commentsContainer = document.querySelector('.comments-container');
+          const userCommentSection = document.getElementById('whiteBox');
 
-  function getComments(id) {
-    const button = document.getElementById('showCommentBox' + id);
-    const postId = button.dataset.postid;
+          // Clear the container before rendering new comments
+          commentsContainer.innerHTML = '';
 
-    fetch('a_retrieveComments.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ commentbtn: postId }),
-    })
-        .then(response => response.json())
-        .then(data => {
-            const comments = data.comments;
-            const commentsContainer = document.querySelector('.comments-container');
-            const userCommentSection = document.getElementById('whiteBox');
+          if (Array.isArray(comments) && comments.length > 0) {
+              comments.forEach(comment => {
+                  // Create the comment element
+                  const commentDiv = document.createElement('div');
+                  commentDiv.classList.add('comment');
+          
+                  // Create the comment header (image, name, and time)
+                  const commentHeader = document.createElement('div');
+                  commentHeader.classList.add('comment-header');
+          
+                  // Create the image element
+                  const img = document.createElement('img');
+                  img.src = `${comment.uimage}`;
+                  img.alt = 'User Image';
+          
+                  // Create the div for name and time
+                  const nameTimeDiv = document.createElement('div');
+                  nameTimeDiv.innerHTML = `
+                      <strong>${comment.ufname} ${comment.ulname}</strong>
+                      <small>${new Date(comment.ctime).toLocaleString()}</small>
+                  `;
+          
+                  // Append image and name/time to the header
+                  commentHeader.appendChild(img);
+                  commentHeader.appendChild(nameTimeDiv);
+          
+                  // Create the paragraph for comment text
+                  const commentText = document.createElement('p');
+                  commentText.textContent = comment.text;
+          
+                  // Append the header and comment text to the comment div
+                  commentDiv.appendChild(commentHeader);
+                  commentDiv.appendChild(commentText);
+          
+                  // Append the comment to the container
+                  commentsContainer.appendChild(commentDiv);
+              });
+          }
+            else {
+              // Display a message if no comments are available
+              commentsContainer.innerHTML = '<p>No comments yet.</p>';
+          }
 
-            // Clear the container before rendering new comments
-            commentsContainer.innerHTML = '';
-
-            if (Array.isArray(comments) && comments.length > 0) {
-                comments.forEach(comment => {
-                    // Create the comment element
-                    const commentDiv = document.createElement('div');
-                    commentDiv.classList.add('comment');
-            
-                    // Create the comment header (image, name, and time)
-                    const commentHeader = document.createElement('div');
-                    commentHeader.classList.add('comment-header');
-            
-                    // Create the image element
-                    const img = document.createElement('img');
-                    img.src = `data:image/jpeg;base64,${comment.uimage}`;
-                    img.alt = 'User Image';
-            
-                    // Create the div for name and time
-                    const nameTimeDiv = document.createElement('div');
-                    nameTimeDiv.innerHTML = `
-                        <strong>${comment.ufname} ${comment.ulname}</strong>
-                        <small>${new Date(comment.ctime).toLocaleString()}</small>
-                    `;
-            
-                    // Append image and name/time to the header
-                    commentHeader.appendChild(img);
-                    commentHeader.appendChild(nameTimeDiv);
-            
-                    // Create the paragraph for comment text
-                    const commentText = document.createElement('p');
-                    commentText.textContent = comment.text;
-            
-                    // Append the header and comment text to the comment div
-                    commentDiv.appendChild(commentHeader);
-                    commentDiv.appendChild(commentText);
-            
-                    // Append the comment to the container
-                    commentsContainer.appendChild(commentDiv);
-                });
-            }
-             else {
-                // Display a message if no comments are available
-                commentsContainer.innerHTML = '<p>No comments yet.</p>';
-            }
-
-            // Ensure the comments section is visible
-            userCommentSection.style.display = 'block';
-        })
-        .catch(error => console.error('Error fetching comments:', error));
+          // Ensure the comments section is visible
+          userCommentSection.style.display = 'block';
+      })
+      .catch(error => console.error('Error fetching comments:', error));
 }
 
 
@@ -216,6 +257,7 @@ function postComment(id){
       .then((response) => response.text())
       .then((data) => {
           console.log("done");
+          userInput.value = "";
       })
       .catch((error) => {
         console.log("error");
@@ -244,12 +286,17 @@ document.getElementById("photoInput").addEventListener("change", function(event)
     }
 });
 
+function showComments(id, pid) {
+  toggleVisibility(true, id, pid);
+}
 
 
 // Function to show or hide the white box and overlay with transition
-function toggleVisibility(show, id) {
+function toggleVisibility(show, id, pid) {
+  const whiteBox = document.getElementById('whiteBox');
+  const overlay = document.getElementById('overlay');
   if (show) {
-    getComments(id)
+    getComments(id, pid);
       whiteBox.style.display = 'block';
       overlay.style.display = 'block';
       setTimeout(() => {
@@ -268,17 +315,12 @@ function toggleVisibility(show, id) {
   }
 }
 
-// Function to show comments
-function showComments(id) {
-  toggleVisibility(true, id);
-}
-
 // Add click event listener **once** to close when clicking outside
 document.addEventListener('click', function (event) {
   if (whiteBox.style.display === 'block' && 
       !whiteBox.contains(event.target) && 
       !event.target.classList.contains('comment-button')) { 
-      toggleVisibility(false);
+      toggleVisibility(false, 0);
   }
 });
 
@@ -287,40 +329,47 @@ whiteBox.addEventListener('click', function (event) {
   event.stopPropagation();
 });
 
-// Close button functionality
-document.getElementById('close-Comments').onclick = function () {
-  toggleVisibility(false);
-};
-
-
-const searchbox = document.getElementById('search');
-
-searchbox.addEventListener("click", function() {
-  searchInput = document.getElementById('searchInput')
-  const userInput = searchInput.value;
-  const parts = userInput.split(/\s+/); // Splits by one or more spaces
-  let requestData = { fname: "", lname: "" };
-
-  if (parts.length >= 2) {
-    requestData.fname = parts[0]; // First name
-    requestData.lname = parts.slice(1).join(" "); // Remaining words as last name
-  } else {
-    requestData.fname = userInput; // If only one word, it's the first name
-  }
-
-  fetch('a_retrieveProfiles.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(requestData)
-  })
-  .then(response => response.json())
-  .then(data => {
-    sessionStorage.removeItem("searchResults");
-    sessionStorage.setItem("searchResults", JSON.stringify(data));
-    //code before the pause
-    
-    window.location.href = `search.php`;
-    
-})
-  .catch(console.error);
+closeComments = document.getElementById("close-Comments");
+closeComments.addEventListener("click", function(){
+  toggleVisibility(false, 0, 0);
 });
+
+function getCookie(name) {
+  const cookie = document.cookie
+      .split('; ')
+      .map(cookie => cookie.split('='))
+      .find(([key]) => key === name)?.[1];
+
+  if (!cookie) return null;
+
+  try {
+    return atob(decodeURIComponent(cookie));
+  } catch (error) {
+    console.error("Invalid Base64 cookie:", error);
+    return null;
+  }
+}
+
+function sendConnectionInProfile(){
+  var id = getCookie("id");
+  const urlParams = new URLSearchParams(window.location.search);
+  const encodedId = urlParams.get("id");
+  if (encodedId) {
+      const decodedId = atob(encodedId);
+      fetch('a_sendConnection.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senderId: id,
+                               receiverId: decodedId }),
+      })
+      
+      .then((response) => response.text())
+      .then((data) => {
+          console.log("connection sent!");
+      })
+      .catch((error) => {
+        console.log("error");
+      });
+  }
+  
+}
