@@ -19,7 +19,7 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
 
         <div class="search-box">
             <input type="text" placeholder="Search" id="searchInput">
-            <span><button id="search" class="search" style="border: none; cursor: pointer;"><img src="images/search.png"></button></span>
+            <span><button id="search" class="search" style="border: none; cursor: pointer;" onClick="retrieveProfiles()"><img src="images/search.png"></button></span>
         </div>
 
     </div>
@@ -34,7 +34,7 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
     </div>
     <div class="navbar-right">
         <div class="online">
-        <?php echo '<img class="nav-profile-img" onclick="toggleMenu()" src="data:image/jpeg;base64,' . base64_encode($user_image) . '" alt="" />'; ?> 
+        <?php echo '<img class="nav-profile-img" onclick="toggleMenu()" src="' . $_SESSION['uimage'] . '" alt="" />'; ?> 
         </div>
     </div>
 <!------- profile drop down menu ------>
@@ -42,7 +42,7 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
     <div class="profile-menu-wrap" id="profileMenu">
         <div class="profile-menu">
             <div class="user-info">
-                <?php echo '<img src="data:image/jpeg;base64,' . base64_encode($user_image) . '" alt="" />'; ?>
+                <?php echo '<img src="' . $_SESSION['uimage'] . '" alt="" />'; ?>
                 <div>
                 <?php echo '<h4>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h4>'?>
                     <a href="myprofile.php">See your profile</a>
@@ -78,6 +78,37 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
     function toggleMenu(){
         profileMenu.classList.toggle("open-menu");
     }
+    function retrieveProfiles(){
+  const searchbox = document.getElementById('search');
+  searchInput = document.getElementById('searchInput')
+  const userInput = searchInput.value;
+  const parts = userInput.split(/\s+/); // Splits by one or more spaces
+  let requestData = { fname: "", lname: "" };
+
+  if (parts.length >= 2) {
+    requestData.fname = parts[0]; // First name
+    requestData.lname = parts.slice(1).join(" "); // Remaining words as last name
+  } else {
+    requestData.fname = userInput; // If only one word, it's the first name
+  }
+
+  fetch('a_retrieveProfiles.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(requestData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    sessionStorage.removeItem("searchResults");
+    sessionStorage.setItem("searchResults", JSON.stringify(data));
+    //code before the pause
+    
+    window.location.href = `search.php`;
+    
+})
+  .catch(console.error);
+}
+
 </script>
 </body>
 </html>

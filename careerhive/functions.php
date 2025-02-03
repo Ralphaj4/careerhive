@@ -5,7 +5,7 @@ if(!isset($_COOKIE['id'])){
 }
 function storeInSession($id){
     require('database.php');
-    $getuInfo = $conn->prepare("SELECT ufname, ulname, uemail, udescription, utitle from users WHERE uid = ?");
+    $getuInfo = $conn->prepare("SELECT ufname, uimage, ulname, uemail, udescription, utitle from users WHERE uid = ?");
     $getuInfo->bind_param("i", $id);
     if($getuInfo->execute()){
         $userInfo = $getuInfo->get_result();
@@ -14,6 +14,7 @@ function storeInSession($id){
             $userInfo->close();
             $_SESSION["fname"] = $user["ufname"];
             $_SESSION["lname"] = $user["ulname"];
+            $_SESSION["uimage"] = $user["uimage"];
             $_SESSION["email"] = $user["uemail"];
             $_SESSION["title"] = $user["utitle"];
             $_SESSION["description"] = $user["udescription"];
@@ -56,7 +57,7 @@ LEFT JOIN
 LEFT JOIN 
     comments ON posts.pid = comments.cpost
 JOIN 
-    connections ON (connections.csender = users.uid OR connections.creceiver = users.uid)
+    connections ON (connections.csender = users.uid OR connections.creceiver = users.uid) AND connections.cstatus='accepted'
 WHERE 
     users.uid != ?
     AND (connections.csender = ? OR connections.creceiver = ?)

@@ -28,7 +28,7 @@ $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
         <div class="profile-container">
             <img src="images/cover-pic.png" width="100%"> <!----- mn l db ---->
             <div class="profile-container-inner">
-                <img src="images/user-1.png" class="profile-pic"> <!----- mn l db ---->
+                <img src="'images/user-1.png'" class="profile-pic"> <!----- mn l db ---->
                 <?php echo '<h1>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h1>'?> <!----- mn l db ---->
                 <?php echo '<b>'.$_SESSION["title"].'</b>'?> <!----- mn l db ---->
                 <div class="mutual-connections">

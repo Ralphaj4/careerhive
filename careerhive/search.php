@@ -58,14 +58,14 @@ require('navbar.php'); ?>
             // Create an image element if the profile has an image
             let imageTag = "";
             if (profile.uimage) {
-                imageTag = `<a href="profile.php?id=${profile.uid}"><img src="data:image/png;base64,${profile.uimage}" alt="User Image" class="profile-img"></a>`;
+                imageTag = `<a href="profile.php?id=${profile.uid}"><img src="${profile.uimage}" alt="User Image" class="profile-img"></a>`;
             }
 
             // Fill the div with user info
             profileDiv.innerHTML = `
                 ${imageTag}
                 <h3><a href="profile.php?id=${profile.uid}">${profile.ufname} ${profile.ulname}<a></h3>
-                <p>Email: ${profile.uemail}</p>
+                <p>About: ${profile.udescription|| 'No about'}</p>
             `;
 
             container.appendChild(profileDiv);

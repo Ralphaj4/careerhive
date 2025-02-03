@@ -63,26 +63,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Process each profile: convert encoding and attach user image
     foreach ($profiles as &$profile) {
         foreach ($profile as $key => $value) {
-            // If the key is 'uimage', you may choose to remove it from the main profile array
-            if (isset($profile['uimage']) && $key === 'uimage') {
-                $profile[$key] = base64_encode($profile[$key]);
-                continue;
-            }
             if($key === 'uid'){
                 $profile[$key] = urlencode(base64_encode($profile['uid']));
                 continue;
             }
             $profile[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
         }
-        // Append the user image (assumes getUserImage returns binary image data)
-        // $image = getUserImage($profile['uid']);
-        // $profile['image'] = base64_encode($image);
     }
 
     $response = [
         'profiles' => $profiles,
-        'fname' => $fname,
-        'likefname' => $like_fname
     ];
 
     // Set the header for JSON response and output the response

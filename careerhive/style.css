@@ -705,16 +705,18 @@ nav.navbar{
     margin: 20px 0;
 }
 
-.profile-btn a{
+.profile-btn button{
     display: inline-flex;
     align-items: center;
     background: #e4e6eb;
     padding: 6px 15px;
     margin-right: 10px;
     border-radius: 4px;
+    border: none;
+    cursor: pointer;
 }
 
-.profile-btn a img{
+.profile-btn button img{
     width: 18px;
     margin-right: 10px;
 }
@@ -911,4 +913,8 @@ nav.navbar{
     margin: 0;
     font-size: 1em;
     padding-top: 10px;
+}
+
+.profile-pic{
+    aspect-ratio: 1/1;
 }
