@@ -23,7 +23,8 @@ storeInSession(base64_decode($_COOKIE["id"]));
 require('navbar.php');
 require('database.php');
 $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
-
+// $news = fetchNews();
+// echo $news['articles']['3']['title'];
 ?>
 
 
@@ -96,23 +97,10 @@ $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
 
     <!------- right sidebar ------>
     <div class="right-sidebar">
-        <div class="sidebar-news">
-            <img src="images/more.png" class="info-icon">
+        <div class="sidebar-news" id="sidebar-news">
             <h3>Trending News</h3>
-            <a href="#">Less work visa for US , more for UK</a>
-            <span><?php echo "Uploaded :  " . date("h:i:sa"); ?></span>
-
-            <a href="#">More hiring = higher confidence?</a>
-            <span><?php echo "Uploaded :  " . date("h:i:sa"); ?></span>
-
-            <a href="#">High demand for skilled manpower</a>
-            <span><?php echo "Uploaded :  " . date("h:i:sa"); ?></span>
-
-            <a href="#">Who is the world's richest?</a>
-            <span><?php echo "Uploaded :  " . date("h:i:sa"); ?></span>
-
-            <a href="#" class="read-more-link">Read More</a>
         </div>
+
 
         <div class="sidebar-ad">
             <small>Ad &middot; &middot; &middot;</small>

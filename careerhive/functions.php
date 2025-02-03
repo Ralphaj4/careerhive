@@ -3,6 +3,7 @@ if(!isset($_COOKIE['id'])){
     header("Location: index.php");
     exit;
 }
+
 function storeInSession($id){
     require('database.php');
     $getuInfo = $conn->prepare("SELECT ufname, uimage, ulname, uemail, udescription, utitle from users WHERE uid = ?");
@@ -33,6 +34,7 @@ function getConnectionCount($id){
         return $connection_count;
     }
 }
+
 
 function RetrievePosts($id){
     require('database.php');

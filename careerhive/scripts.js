@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let count = 1;
         
             data.posts.forEach((post) => {
-                let likeButton = post.is_liked === "liked" ? "liked" : "like"; // Simulating PHP's CheckIfLiked
+                let likeButton = post.is_liked === "liked" ? "liked" : "like";
         
                 const postElement = document.createElement("div");
                 postElement.classList.add("post");
@@ -105,6 +105,45 @@ document.addEventListener('DOMContentLoaded', function () {
         }
   })
   .catch(error => console.error('Error fetching posts:', error));
+
+
+  fetch('a_fetchNews.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+}).then(response => response.json())
+  .then(data => {
+      const newsContainer = document.getElementById('sidebar-news');
+      newsContainer.innerHTML = ''; // Clear existing content
+
+      const title = document.createElement('h3');
+      title.textContent = "Trending News";
+      newsContainer.appendChild(title);
+      if (data.articles && data.articles.length > 0) {
+          for (let i = 0; i < 4; i++) { // Ensure we only take up to 4 articles
+              const article = data.articles[i];
+              console.log(data.articles[i]);
+              // Create the anchor element
+              const newsItem = document.createElement("a");
+              newsItem.href = article.link;
+              newsItem.innerHTML = `<p>${article.title}</p>`;
+
+              // Create the small tag for publication date and source
+              const newsMeta = document.createElement("small");
+              newsMeta.innerHTML = `${article.pubDate} <span>${article.source_id}</span>`;
+
+              // Append to the container
+              newsContainer.appendChild(newsItem);
+              newsContainer.appendChild(newsMeta);
+          }
+
+      } else {
+          newsContainer.innerHTML = `<div style="display:flex; align-items:center;justify-content: center;height: 70vh;">
+              <h2>No News Found</h2>
+          </div>`;
+      }
+  })
+  .catch(error => console.error('Error fetching news:', error));
+
 
   submitButton.addEventListener('click', function (event) {
       event.preventDefault(); // Prevent default form submission
