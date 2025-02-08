@@ -11,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt = $conn->prepare("SELECT 
     posts.ptext,
     posts.pimage,
+    posts.pauthor,
     posts.pid,
     posts.pcreation,
     users.uimage, 

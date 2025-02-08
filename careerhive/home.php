@@ -14,7 +14,7 @@ if(!isset($_COOKIE['id'])){
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>CareerHive</title>
 </head>
-<body>
+<body data-page="home">
    
 <?php 
 require('functions.php');
@@ -43,7 +43,7 @@ $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
                 </ul>
             </div>
             <div class="sidebar-profile-link">
-                <a href="#"><img src="images/items.png">My items</a>
+                <a href="myitems.php"><img src="images/items.png">My items</a>
                 <a href="#"><img src="images/premium.png">Post ad</a> <!---- hon hiye l panel l 3al yamin l 5asa bel ads mn5aliha eza 7ada 3ml add ad byn7at sorto 3al yamin w sho bado y3ml post ----->
             </div>
         </div>
@@ -91,7 +91,12 @@ $connections = getConnectionCount(base64_decode($_COOKIE["id"]));
             <p>Sort by: <span>top <img src="images/down-arrow.png"></span></p>
         </div>
         
-        <div id="posts-container"></div>
+        <div id="posts-container">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+        </div>
+        </div>
+
                
     </div>
 

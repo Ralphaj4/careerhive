@@ -36,8 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
          }
      }
 
-    //$image = getUserImage($comment['uid']);
-
     $response = [
         'comments' => $comments,
     ];

@@ -35,6 +35,13 @@ function getConnectionCount($id){
     }
 }
 
+function InsertNotification($sender, $receiver, $type, $postid){
+    require('database.php');
+    $notif = $conn->prepare("INSERT INTO notifications (senderid, receiverid, ntype, postid) VALUES (?, ?, ?, ?)");
+    $notif->bind_param('iisi', $sender, $receiver, $type, $postid);
+    $notif->execute();
+    $notif->close();
+}
 
 function RetrievePosts($id){
     require('database.php');
@@ -111,6 +118,22 @@ function getUserData($id){
     $user = $result->fetch_assoc();
     $stmt->close();
     return $user;
+
+    $userId = $_SESSION['user_id'] ?? null;
+    echo json_encode(['userId' => $userId]);
+}
+
+function handleTime($dateString) {
+    $date = new DateTime($dateString);
+    $now = new DateTime();
+    $diff = $now->diff($date);
+
+    if ($diff->days == 0) {
+        if ($diff->h < 24) {
+            return $diff->h . " hours ago";
+        }
+    }
+    return $date->format("F jS \a\\t H:i");
 }
 
 ?>

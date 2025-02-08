@@ -1,16 +1,52 @@
-function sanitize(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+function formatTimeAgo(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+
+  if (diffSeconds < 60) {
+      return `${diffSeconds} seconds ago`;
+  } else if (diffMinutes < 60) {
+      return `${diffMinutes} minutes ago`;
+  } else if (diffHours < 24) {
+      return `${diffHours} hours ago`;
+  }
+
+  const options = { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" };
+  return date.toLocaleString("en-US", options).replace(",", " at");
 }
+
 
 
 document.addEventListener('DOMContentLoaded', function () {
   const submitButton = document.getElementById('submitBtn');
   const userInputField = document.getElementById('userInput');
   const photoInput = document.getElementById('photoInput');
+  const pageType = document.body.getAttribute('data-page');
 
-
+  if (pageType === 'home') {
+    document.getElementById('photoButton').addEventListener("click", function() {
+      document.getElementById('photoInput').click(); // Opens the file explorer
+    });
+    
+    document.getElementById('photoInput').addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const mediaPreview = document.getElementById("mediaPreview");
+                mediaPreview.innerHTML = "";
+                const imgPreview = document.createElement("img");
+                imgPreview.src = e.target.result;
+                imgPreview.style.borderRadius = 0;
+                imgPreview.style.maxWidth = "150px"; // Adjust size
+                mediaPreview.appendChild(imgPreview);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
     fetch('a_fetchPost.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
@@ -24,11 +60,8 @@ document.addEventListener('DOMContentLoaded', function () {
             let count = 1;
         
             data.posts.forEach((post) => {
-                let likeButton = post.is_liked === "liked" ? "liked" : "like";
-        
                 const postElement = document.createElement("div");
                 postElement.classList.add("post");
-        
                 postElement.innerHTML = `
                     <div class="post-author">
                         <a href="profile.php?id=${encodeURIComponent(btoa(post.uid))}">
@@ -36,13 +69,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         </a>
                         <div>
                             <a href="profile.php?id=${encodeURIComponent(btoa(post.uid))}" style="text-decoration: none; color: inherit;">
-                                <h1>${sanitize(post.ufname)} ${sanitize(post.ulname)}</h1>
+                                <h1>${post.ufname} ${post.ulname}</h1>
                             </a>
-                            <small>${sanitize(post.utitle)}</small>
-                            <small>${sanitize(post.pcreation)}</small>
+                            <small>${post.utitle}</small>
+                            <small>${formatTimeAgo(post.pcreation)}</small>
                         </div>
                     </div>
-                    <p>${sanitize(post.ptext)}</p>
+                    <p>${post.ptext}</p>
                     ${post.pimage ? `<img src="${post.pimage}" alt="" width="100%" />` : ""}
                     
                     <div class="post-stats">
@@ -64,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                         <div class="post-activity-link">
                             <button id="like" class="like" onClick="toggleImage(${post.pid})" data-postid="${post.pid}">
-                                <img src="images/${likeButton}.png" id="toggleImage${post.pid}">
+                                <img src="images/${post.is_liked}.png" id="toggleImage${post.pid}">
                                 <span>Like</span>
                             </button>
                         </div>
@@ -75,23 +108,20 @@ document.addEventListener('DOMContentLoaded', function () {
                             </button>
                         </div>
                         <div class="post-activity-link">
-                            <button><img src="images/share.png"><span>Share</span></button>
-                        </div>
-                        <div class="post-activity-link">
-                            <button><img src="images/send.png"><span>Send</span></button>
+                            <button><img src="images/${post.is_saved}.png"><span>Save</span></button>
                         </div>
                         
-                        <div id="overlay" class="overlay" style="display: none;"></div>
-                        <div id="whiteBox" class="white-box" style="display: none;">
+                        <div id="overlay${count}" class="overlay" style="display: none;"></div>
+                        <div id="whiteBox${count}" class="white-box" style="display: none;">
                             <div>
-                                <button id="close-Comments" class="close-Comments" onClick="toggleVisibility(false, 0, 0)"><p>X</p></button>
+                                <button id="close-Comments" class="close-Comments" onClick="toggleVisibility(false, ${count}, 0)"><p>X</p></button>
                             </div>
-                            <div class="comments-container">
+                            <div class="comments-container" id="comments-container${count}">
                                 <p>Comments will appear here...</p>
                             </div>
                             <div>
-                                <textarea id="userComment" name="userComment" rows="1" placeholder="Type a comment"></textarea>
-                                <button id="sendComment${post.pid}" class="sendComment" onClick="postComment(${post.pid})"><img src="images/send.png"></button>
+                                <textarea id="userComment${count}" class="userComment" name="userComment" rows="1" placeholder="Type a comment"></textarea>
+                                <button id="sendComment${post.pid}" class="sendComment" onClick="postComment(${count},${post.pid})"><img src="images/send.png"></button>
                             </div>
                         </div>
                     </div>
@@ -113,25 +143,23 @@ document.addEventListener('DOMContentLoaded', function () {
 }).then(response => response.json())
   .then(data => {
       const newsContainer = document.getElementById('sidebar-news');
-      newsContainer.innerHTML = ''; // Clear existing content
+      newsContainer.innerHTML = '';
 
       const title = document.createElement('h3');
       title.textContent = "Trending News";
       newsContainer.appendChild(title);
       if (data.articles && data.articles.length > 0) {
-          for (let i = 0; i < 4; i++) { // Ensure we only take up to 4 articles
+          for (let i = 0; i < 4; i++) { 
               const article = data.articles[i];
               console.log(data.articles[i]);
-              // Create the anchor element
+
               const newsItem = document.createElement("a");
               newsItem.href = article.link;
               newsItem.innerHTML = `<p>${article.title}</p>`;
 
-              // Create the small tag for publication date and source
               const newsMeta = document.createElement("small");
               newsMeta.innerHTML = `${article.pubDate} <span>${article.source_id}</span>`;
 
-              // Append to the container
               newsContainer.appendChild(newsItem);
               newsContainer.appendChild(newsMeta);
           }
@@ -143,6 +171,128 @@ document.addEventListener('DOMContentLoaded', function () {
       }
   })
   .catch(error => console.error('Error fetching news:', error));
+  }
+
+  if(pageType === "myitems"){
+    fetch('a_fetchMyItems.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+  }).then(response => response.json())
+    .then(data => {
+      const postsContainer = document.getElementById('posts-container');
+          postsContainer.innerHTML = '';
+
+          if (data.posts.length > 0) {
+            let count = 1;
+        
+            data.posts.forEach((post) => {
+                const postElement = document.createElement("div");
+                postElement.classList.add("post");
+                postElement.innerHTML = `
+                    <div class="post-author">
+                        <a href="profile.php?id=${encodeURIComponent(btoa(post.uid))}">
+                            <img src="${post.uimage}" alt="">
+                        </a>
+                        <div>
+                            <a href="profile.php?id=${encodeURIComponent(btoa(post.uid))}" style="text-decoration: none; color: inherit;">
+                                <h1>${post.ufname} ${post.ulname}</h1>
+                            </a>
+                            <small>${post.utitle}</small>
+                            <small>${formatTimeAgo(post.pcreation)}</small>
+                        </div>
+                    </div>
+                    <p>${post.ptext}</p>
+                    ${post.pimage ? `<img src="${post.pimage}" alt="" width="100%" />` : ""}
+                    
+                    <div class="post-stats">
+                        <div>
+                            <img src="images/thumbsup.png">
+                            <img src="images/love.png">
+                            <img src="images/clap.png">
+                            <span class="liked-users">${post.like_count} likes</span>
+                        </div>
+                        <div>
+                            <span>${post.comment_count} comments &middot; y shares</span>
+                        </div>
+                    </div>
+                    
+                    <div class="post-activity">
+                        <div>
+                            <img src="${post.uimage}" alt="" class="post-activity-user-icon">
+                            <img src="images/down-arrow.png" class="post-activity-arrow-icon">
+                        </div>
+                        <div class="post-activity-link">
+                            <button id="like" class="like" onClick="toggleImage(${post.pid})" data-postid="${post.pid}">
+                                <img src="images/${post.is_liked}.png" id="toggleImage${post.pid}">
+                                <span>Like</span>
+                            </button>
+                        </div>
+                        <div class="post-activity-link">
+                            <button id="showCommentBox${count}" class="comment-post" onClick="showComments(${count},${post.pid})" data-postid="${post.pid}">
+                                <img src="images/comment.png">
+                                <span>Comment</span>
+                            </button>
+                        </div>
+                        <div class="post-activity-link">
+                            <button><img src="images/${post.is_saved}.png"><span>Save</span></button>
+                        </div>
+                        
+                        <div id="overlay${count}" class="overlay" style="display: none;"></div>
+                        <div id="whiteBox${count}" class="white-box" style="display: none;">
+                            <div>
+                                <button id="close-Comments" class="close-Comments" onClick="toggleVisibility(false, ${count}, 0)"><p>X</p></button>
+                            </div>
+                            <div class="comments-container" id="comments-container${count}">
+                                <p>Comments will appear here...</p>
+                            </div>
+                            <div>
+                                <textarea id="userComment${count}" class="userComment" name="userComment" rows="1" placeholder="Type a comment"></textarea>
+                                <button id="sendComment${post.pid}" class="sendComment" onClick="postComment(${count},${post.pid})"><img src="images/send.png"></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        
+                postsContainer.appendChild(postElement);
+                count++;
+            });
+        } else {
+            postsContainer.innerHTML = '<div style="display:flex; align-items:center;justify-content: center;height: 70vh;"><h2>No Posts Found</h2></div>';
+        }
+    })
+    .catch(error => console.error('Error fetching news:', error));
+  }
+
+
+  if(pageType === "myprofile"){
+    fetch('a_fetchMyProfile.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+  }).then(response => response.json())
+    .then(data => {
+        const myimage = document.getElementById('profile-image');
+        const mycover = document.getElementById('cover-image');
+        const mytitle = document.getElementById('currentTitle');
+        const mydesc = document.getElementById('description');
+        myimage.src = data.user[0].uimage;
+        mycover.src = data.user[0].ucover;
+        mytitle.innerHTML = data.user[0].utitle;
+        mydesc.innerHTML = data.user[0].udescription;
+    })
+    .catch(error => console.error('Error fetching news:', error));
+  }
+
+
+  if(pageType === "network"){
+    fetch('a_fetchNetwork.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+  }).then(response => response.json())
+    .then(data => {
+        
+    })
+    .catch(error => console.error('Error fetching news:', error));
+  }
 
 
   submitButton.addEventListener('click', function (event) {
@@ -200,7 +350,7 @@ function likePost(pid){
         })
         .then(response => response.json())
         .then(data => {
-          console.log("clicked");
+          //console.log("clicked");
         })
         .catch(console.error);
 }
@@ -217,8 +367,8 @@ function getComments(id, pid) {
       .then(response => response.json())
       .then(data => {
           const comments = data.comments;
-          const commentsContainer = document.querySelector('.comments-container');
-          const userCommentSection = document.getElementById('whiteBox');
+          const commentsContainer = document.getElementById('comments-container' + id);
+          const userCommentSection = document.getElementById('whiteBox' + id);
 
           // Clear the container before rendering new comments
           commentsContainer.innerHTML = '';
@@ -242,7 +392,7 @@ function getComments(id, pid) {
                   const nameTimeDiv = document.createElement('div');
                   nameTimeDiv.innerHTML = `
                       <strong>${comment.ufname} ${comment.ulname}</strong>
-                      <small>${new Date(comment.ctime).toLocaleString()}</small>
+                      <small>${formatTimeAgo(comment.ctime)}</small>
                   `;
           
                   // Append image and name/time to the header
@@ -280,10 +430,10 @@ function getComments(id, pid) {
 
 
 
-function postComment(id){
+function postComment(count, id){
     const postComment = document.getElementById("sendComment" + id);
     console.log(id); 
-    const userInput = document.getElementById('userComment');
+    const userInput = document.getElementById('userComment' + count);
     const userComment = userInput.value
     fetch('a_postComment.php', {
       method: 'POST',
@@ -295,7 +445,6 @@ function postComment(id){
     
       .then((response) => response.text())
       .then((data) => {
-          console.log("done");
           userInput.value = "";
       })
       .catch((error) => {
@@ -304,36 +453,58 @@ function postComment(id){
 };
 
 
-document.getElementById("photoButton").addEventListener("click", function() {
-  document.getElementById("photoInput").click(); // Opens the file explorer
-});
-
-document.getElementById("photoInput").addEventListener("change", function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const mediaPreview = document.getElementById("mediaPreview");
-            mediaPreview.innerHTML = "";
-            const imgPreview = document.createElement("img");
-            imgPreview.src = e.target.result;
-            imgPreview.style.borderRadius = 0;
-            imgPreview.style.maxWidth = "150px"; // Adjust size
-            mediaPreview.appendChild(imgPreview);
-        };
-        reader.readAsDataURL(file);
+document.getElementById("description").addEventListener("input", function() {
+    const submitBtn = document.getElementById("submit-btn");
+    const textarea = this;
+    
+    // Show the submit button when the user starts typing
+    if (textarea.value.trim() !== "") {
+        submitBtn.style.display = "block"; // Show the button
+        submitBtn.style.backgroundColor = "#0073b1"; // LinkedIn blue when there's text
+        submitBtn.style.color = "#fff"; // White text
+    } else {
+        submitBtn.style.display = "none"; // Hide the button when the textarea is empty
     }
 });
+
+function uploadDescription(id) {
+    const userInput = document.getElementById('description').value;
+    const userId = id; // Assuming `id` is available from your context
+
+    // If the description is empty, send an empty string instead
+    const description = userInput.trim() === '' ? '' : userInput;
+
+    fetch('a_uploadDescription.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: description, uid: userId }),
+    })
+        .then(response => response.text())  // Get the text response from the server
+        .then(data => {
+            console.log("Server response:", data);
+
+            // Check if the description was saved successfully by the server
+            if (data === "Data saved successfully!") {
+                location.reload(); // Reload the page after success
+            } else {
+                // If not successful, display an error
+                alert("Failed to update description. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.log("Error:", error);
+            alert("An error occurred. Please try again.");
+        });
+}
 
 function showComments(id, pid) {
   toggleVisibility(true, id, pid);
 }
 
-
 // Function to show or hide the white box and overlay with transition
 function toggleVisibility(show, id, pid) {
-  const whiteBox = document.getElementById('whiteBox');
-  const overlay = document.getElementById('overlay');
+  const whiteBox = document.getElementById('whiteBox' + id);
+  const overlay = document.getElementById('overlay' + id);
   if (show) {
     getComments(id, pid);
       whiteBox.style.display = 'block';
@@ -359,7 +530,7 @@ document.addEventListener('click', function (event) {
   if (whiteBox.style.display === 'block' && 
       !whiteBox.contains(event.target) && 
       !event.target.classList.contains('comment-button')) { 
-      toggleVisibility(false, 0);
+      toggleVisibility(false, 0, 0);
   }
 });
 
@@ -368,10 +539,10 @@ whiteBox.addEventListener('click', function (event) {
   event.stopPropagation();
 });
 
-closeComments = document.getElementById("close-Comments");
-closeComments.addEventListener("click", function(){
-  toggleVisibility(false, 0, 0);
-});
+// closeComments = document.getElementById("close-Comments");
+// closeComments.addEventListener("click", function(){
+//   toggleVisibility(false, 0, 0);
+// });
 
 function getCookie(name) {
   const cookie = document.cookie
@@ -411,4 +582,51 @@ function sendConnectionInProfile(){
       });
   }
   
+}
+
+
+
+// Get the elements from the DOM
+// Get the elements using getElementById
+function editTitle(){
+    const titleInput = document.getElementById('titleInput');
+    const currentTitle = document.getElementById('currentTitle');
+
+    // Toggle input visibility
+    titleInput.style.display = 'block';
+    currentTitle.style.display = 'none';
+    
+    // Set input value to the current title text
+    titleInput.value = currentTitle.textContent;
+  
+  document.getElementById("titleInput").addEventListener("blur", function() {
+    const newTitle = this.value;
+  
+    // Send the updated title to the server if the title changed
+    if (newTitle !== document.getElementById('currentTitle').textContent) {
+      // Make the fetch request to save the title
+      fetch('a_saveTitle.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          newTitle: newTitle
+        }),
+      })
+      .then((response) => response.json())
+      .then((data) => {
+          setTimeout(() => {
+            window.location.reload();
+        }, 100);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+    }
+    
+    // Hide the input field and show the updated title
+    this.style.display = 'none';
+    document.getElementById('currentTitle').style.display = 'block';
+  });
 }

@@ -26,7 +26,7 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
     <div class="navbar-center">
         <ul>
             <li><a href="home.php" class="active-link"><img src="images/home.png"><span>Home</span></a></li>
-            <li><a href="#"><img src="images/network.png"><span>My Network</span></a></li>
+            <li><a href="network.php"><img src="images/network.png"><span>My Network</span></a></li>
             <li><a href="#"><img src="images/jobs.png"><span>Jobs</span></a></li>
             <li><a href="#"><img src="images/message.png"><span>Messaging</span></a></li>
             <li><a href="#"><img src="images/notification.png"><span>Notifications</span></a></li>
@@ -59,7 +59,7 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
                 <p>Settings & Privacy</p>
                 <span>></span>
             </a>
-            <a href="#" class="profile-menu-link">
+            <a href="mailto: ralphaj4@gmail.com" class="profile-menu-link">
                 <img src="images/help.png">
                 <p>Help & Support</p>
                 <span>></span>

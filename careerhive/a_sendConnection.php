@@ -1,5 +1,6 @@
 <?php
 require('database.php');
+require_once('functions.php');
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -7,12 +8,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = 'pending';
     $senderId = $input['senderId'] ?? null;
     $receiverId = $input['receiverId'] ?? null;
+    $type = 'connection';
+    $postid = 0;
 
     if (!$senderId || !$receiverId) {
         echo json_encode(['success' => false, 'error' => 'Invalid input']);
         exit;
     }
     else{
+        InsertNotification($senderId, $receiverId, $type, $postid);
         $stmt = $conn->prepare("INSERT INTO connections VALUES (?, ?, ?)");
     }
     

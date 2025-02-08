@@ -48,6 +48,15 @@ echo '
                 </div>
             </div>
         </div>
+
+        <div class="profile-description">
+        <br>
+            <h2>About</h2>
+            <div class="textarea-container">
+                <textarea id="description" name="description" rows="5" placeholder="No About" disabled>'.$user['udescription'].'</textarea>
+            </div>
+        </div>
+
         <div class="profile-sidebar"></div>
     </div>
 </div>

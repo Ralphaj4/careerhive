@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     require_once 'vendor/autoload.php';
-    
+
     $key = "pub_677278084f8d62edf13a3930c0ac6000b98a7";
     $newsdataApiObj = new NewsdataApi($key);
 
@@ -15,36 +15,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     $randomTopic = $topics[array_rand($topics)];
     $randomCountry = $countries[array_rand($countries)];
 
-    $data = array("q" => $randomTopic, "country" => $randomCountry);
+    $data = ["q" => $randomTopic, "country" => $randomCountry];
 
     $response = $newsdataApiObj->get_latest_news($data);
 
     $newsArray = json_decode(json_encode($response), true);
+    
+    $fourNews = []; // Ensure variable is always set
 
     if (isset($newsArray['results']) && is_array($newsArray['results'])) {
         shuffle($newsArray['results']);
-        $randomNews = array_slice($newsArray['results'], 0, 4);
-        
-        $news = json_encode([
-            "search_query" => $randomTopic,
-            "country" => $randomCountry,
-            "articles" => $randomNews
-        ], JSON_PRETTY_PRINT);
-        echo $news;
-        $fourNews = json_decode($news, true);
+        $fourNews = array_slice($newsArray['results'], 0, 4);
     }
 
-    else {
-        echo json_encode(["error" => "No news found for '$randomTopic' in '$randomCountry'"], JSON_PRETTY_PRINT);
-    }
-
+    // Prepare the response
     $response = [
-        'news' => $fourNews
+        "search_query" => $randomTopic,
+        "country" => $randomCountry,
+        "articles" => $fourNews
     ];
 
     // Send the JSON response
     header('Content-Type: application/json');
-    echo json_encode($response);
+    echo json_encode($response, JSON_PRETTY_PRINT);
     exit;
 }
+
 ?>
