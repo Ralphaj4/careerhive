@@ -43,6 +43,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param('iiii', $senderId, $receiverId, $receiverId, $senderId);
         $stmt->execute();
     }
+    elseif($action == 2){
+        $stmt = $conn->prepare("UPDATE connections SET cstatus = 'accepted' WHERE (csender = ? AND creceiver = ?) OR (csender = ? AND creceiver = ?)");
+        $stmt->bind_param('iiii', $senderId, $receiverId, $receiverId, $senderId);
+        $stmt->execute();
+    }
 
 
     $response = [

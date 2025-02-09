@@ -1,10 +1,13 @@
-<?php 
-if(!isset($_COOKIE['id'])){
+<?php
+if (!isset($_COOKIE['id'])) {
     header("Location: index.php");
     exit;
 }
 require_once('functions.php');
 $user_image = getUserImage(base64_decode($_COOKIE['id']));
+
+// Get the current page filename
+$current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,38 +16,46 @@ $user_image = getUserImage(base64_decode($_COOKIE['id']));
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+
 <nav class="navbar">
     <div class="navbar-left">
         <a href="home.php" class="logo"><img src="images/logo.png"></a>
 
         <div class="search-box">
             <input type="text" placeholder="Search" id="searchInput">
-            <span><button id="search" class="search" style="border: none; cursor: pointer;" onClick="retrieveProfiles()"><img src="images/search.png"></button></span>
+            <span><button id="search" class="search" style="border: none; cursor: pointer;" onClick="retrieveProfiles()">
+                <img src="images/search.png"></button></span>
         </div>
-
     </div>
+    
     <div class="navbar-center">
         <ul>
-            <li><a href="home.php" class="active-link"><img src="images/home.png"><span>Home</span></a></li>
-            <li><a href="network.php" ><img src="images/network.png"><span>My Network</span></a></li>
-            <li><a href="#"><img src="images/jobs.png"><span>Jobs</span></a></li>
-            <li><a href="#"><img src="images/message.png"><span>Messaging</span></a></li>
-            <li><a href="#"><img src="images/notification.png"><span>Notifications</span></a></li>
+            <li><a href="home.php" class="<?= $current_page == 'home.php' ? 'active-link' : '' ?>">
+                <img src="images/home.png"><span>Home</span></a></li>
+            <li><a href="network.php" class="<?= $current_page == 'network.php' ? 'active-link' : '' ?>">
+                <img src="images/network.png"><span>My Network</span></a></li>
+            <li><a href="jobs.php" class="<?= $current_page == 'jobs.php' ? 'active-link' : '' ?>">
+                <img src="images/jobs.png"><span>Jobs</span></a></li>
+            <li><a href="messaging.php" class="<?= $current_page == 'messaging.php' ? 'active-link' : '' ?>">
+                <img src="images/message.png"><span>Messaging</span></a></li>
+            <li><a href="notifications.php" class="<?= $current_page == 'notifications.php' ? 'active-link' : '' ?>">
+                <img src="images/notification.png"><span>Notifications</span></a></li>
         </ul>
     </div>
+
     <div class="navbar-right">
         <div class="online">
-        <?php echo '<img class="nav-profile-img" onclick="toggleDropMenu()" src="' . $_SESSION['uimage'] . '" alt="" />'; ?> 
+            <?php echo '<img class="nav-profile-img" onclick="toggleDropMenu()" src="' . $_SESSION['uimage'] . '" alt="" />'; ?>
         </div>
     </div>
-<!------- profile drop down menu ------>
 
+    <!------- Profile Drop-down Menu ------>
     <div class="profile-menu-wrap" id="profileMenu">
         <div class="profile-menu">
             <div class="user-info">
                 <?php echo '<img src="' . $_SESSION['uimage'] . '" alt="" />'; ?>
                 <div>
-                <?php echo '<h4>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h4>'?>
+                    <?php echo '<h4>' . $_SESSION["fname"] . " " . $_SESSION["lname"] . '</h4>' ?>
                     <a href="myprofile.php">See your profile</a>
                 </div>
             </div>

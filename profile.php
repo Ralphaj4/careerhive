@@ -18,7 +18,8 @@ $connections = getConnectionCount(base64_decode($_GET["id"]));
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="images/logo.ico"> 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>CareerHive</title>
 </head>
@@ -41,9 +42,12 @@ echo '
                 <div class="profile-btn">
                     <button class="primary-btn" id="primary-btn" onclick="sendConnectionInProfile()">
                         <img src="images/connect.png" alt="Connect Icon" id="connect-img">
+                        <span>Reject</span> <!-- Ensure this span is inside the button -->
+                    </button>
+                    <button class="primary-btn" id="reject" onclick="sendConnectionInProfile(0)" style="display: none;">
+                        <img src="images/x.png" alt="Connect Icon" id="reject-img">
                         <span>Connect</span> <!-- Ensure this span is inside the button -->
                     </button>
-
                     <button>
                         <img src="images/chat.png" alt="Chat Icon"> Message
                     </buttons>

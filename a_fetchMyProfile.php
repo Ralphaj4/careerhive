@@ -18,7 +18,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt_posts->close();
 
 
-    $stmt_user = $conn->prepare("SELECT uimage, ucover, udescription, utitle from users WHERE uid = ? ");
+    $stmt_user = $conn->prepare("SELECT 
+    users.uimage, users.ucover, users.udescription, users.utitle, major.mstart, major.mend, major.mtype,
+    institutions.iname
+FROM 
+    users
+JOIN
+    major ON users.uid = major.muser
+JOIN
+    institutions ON institutions.iid = major.minstitution
+WHERE 
+    uid = ? ");
     $stmt_user->bind_param("i", $id);
     if (!$stmt_user->execute()) {
         echo json_encode(['error' => 'Database error: ' . $stmt->error]);

@@ -661,7 +661,7 @@ nav.navbar{
     flex-basis: 25%;
     align-self: flex-start;
     position: sticky;
-    top: 73%;
+    top: 73px;
 }
 
 .profile-container{
@@ -1186,4 +1186,170 @@ nav.navbar{
     width: 35; /* Adjust accordingly */
     padding: 10px;
     border-left: 2px solid #ccc; /* Vertical separator */
+}
+
+#posts-container h1, #resultsContainer h2{
+    margin-left: 3%;
+}
+
+.profile-experience{
+    display: flex;
+    align-items: flex-start;
+    margin: 10px 0;
+}
+
+
+.profile-experience img{
+    width: 50px;
+    margin-left: 15px;
+    margin-top: 15px;
+    margin-right: 15px;
+    margin-left: 50px;
+}
+
+.profile-experience div{
+    width: 100%;
+}
+
+.profile-experience-container h2{
+    margin-left: 10px;
+    margin-top: 20px;
+    
+}
+
+.profile-experience h3{
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-top: 20px;
+    margin-left: 50px;
+}
+
+.profile-experience b {
+    display: block;
+    font-weight: 500;
+    font-size: 15px;
+    margin-left: 50px;
+}
+
+.profile-experience p {
+    margin-top: 20px;
+    margin-left: 50px;
+}
+
+.profile-experience hr{
+    border: 0;
+    border-bottom: 1px solid #999;
+    margin-top: 10px;
+    margin-right: 100px;
+}
+
+.experience-link{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 20px;
+    font-weight: 500;
+
+}
+
+.profile-experience-container{
+    background-color: white;
+    padding: 15px;
+}
+
+.experience-link img{
+    width: 20px;
+    margin-left: 8px;
+}
+
+
+.profile-education{
+    display: flex;
+    align-items: flex-start;
+    margin: 10px 0;
+}
+
+
+.profile-education img{
+    width: 50px;
+    margin-left: 15px;
+    margin-top: 15px;
+    margin-right: 15px;
+    margin-left: 50px;
+}
+
+.profile-education div{
+    width: 100%;
+}
+
+.profile-education-container h2{
+    margin-left: 10px;
+    margin-top: 20px;
+    
+}
+
+.profile-education h3{
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-top: 20px;
+    margin-left: 50px;
+}
+
+.profile-education b {
+    display: block;
+    font-weight: 500;
+    font-size: 15px;
+    margin-left: 50px;
+}
+
+.profile-education p {
+    margin-top: 20px;
+    margin-left: 50px;
+}
+
+.profile-education hr{
+    border: 0;
+    border-bottom: 1px solid #999;
+    margin-top: 10px;
+    margin-right: 100px;
+}
+
+
+.profile-education-container{
+    background-color: white;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.profile-skills-container{
+    background-color: white;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.skill{
+    display: inline-block;
+    margin: 10px 5px;
+    padding: 6px 18px;
+    border: 1px solid #777;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.profile-language-container{
+    background-color: white;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.language{
+    display: inline-block;
+    margin: 10px 5px;
+    padding: 6px 18px;
+    background: #e4e6eb;
+    font-size: 12px;
+    font-weight: 500;
 }

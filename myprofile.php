@@ -15,7 +15,8 @@ $connections = getConnectionCount($userId);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="images/logo.ico">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>CareerHive</title>
 </head>
@@ -88,13 +89,64 @@ $connections = getConnectionCount($userId);
             </div>
         </div>
         
+        <div class="profile-experience-container">
+            <h2>Experience</h2>
+            <div class="profile-experience">
+                <img src = "images/microsoft.png">
+                <div>
+                    <h3> Lead Front-End Developer</h3>
+                    <b>Microsoft &middot; Full-time</b>
+                    <b>Feb 2021 - Present &middot; 1.5 years</b>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+                    <hr>
+                </div>
+            </div>
+            <a href="#" class="experience-link" > Show all (count of experiences) experiences <img src="images/right-arrow.png"></a>
+        </div>
+
+        <div class="profile-education-container">
+            <h2>Education</h2>
+            <div class="profile-education">
+                <img src = "images/stanford.png">
+                <div>
+                    <h3>Stanford University</h3>
+                    <b>BSEE, Electrical Engineering </b>
+                    <b>2018 - 2022 </b>
+                    <hr>
+                </div>
+            </div>
         </div>
 
 
+        <div class="profile-skills-container">
+            <h2>Skills</h2>
+            <a href="#" class="skill">C#</a>
+            <a href="#" class="skill">Java</a>
+            <a href="#" class="skill">Php</a>
+            <a href="#" class="skill">C</a>
+            <a href="#" class="skill">JS</a>
+            <a href="#" class="skill">HTML</a>
+            <a href="#" class="skill">CSS</a>
+        </div>
 
-    <div class="profile-sidebar"></div>
+        <div class="profile-language-container">
+            <h2>Languages</h2>
+            <a href="#" class="language">English</a>
+            <a href="#" class="language">Portuguese</a>
+            <a href="#" class="language">Arabic</a>
+        </div>
+    </div>
+    </div>
+    <div class="profile-sidebar">
+        <div class="sidebar-news" id="sidebar-news">
+            <h3>Trending News</h3>
+        </div>
+    </div>
+    
 </div>
 
+    
+              
 </body>
 <script src="scripts.js"></script>
 

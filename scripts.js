@@ -176,14 +176,15 @@ document.addEventListener('DOMContentLoaded', function () {
   if (pageType === 'profile') {
     const urlParams = new URLSearchParams(window.location.search);
     const profileUserId = atob(urlParams.get("id")); // Profile user ID from the URL
-    const currentUserId = getCookie("id"); // Get current user ID from cookie
+    const rejectButton = document.getElementById("reject");
 
-    if (profileUserId && currentUserId) {
-        fetch(`a_getConnectionStatus.php?userId=${currentUserId}&profileId=${profileUserId}`)
+    if (profileUserId) {
+        fetch(`a_getConnectionStatus.php?profileId=${profileUserId}`)
             .then(response => response.json())
             .then(data => {
                 const connectionStatus = data.cstatus;
                 const connectButton = document.getElementById("primary-btn");
+                const rejectButton = document.getElementById("reject");
                 const connectImg = connectButton.querySelector("#connect-img"); // Select the image inside the button
 
                 // Update the button based on the connection status
@@ -195,6 +196,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     connectImg.src = "images/connected.png"; // Update image source to connected
                     connectButton.querySelector("span").textContent = "Connected"; // Update the text to "Connected"
                     connectButton.setAttribute('onclick', 'sendConnectionInProfile(0)'); // Disable click action
+                }else if (connectionStatus === 'accept') {
+                    connectImg.src = "images/connected.png"; // Update image source to connected
+                    connectButton.querySelector("span").textContent = "Accept"; // Update the text to "Connected"
+                    connectButton.setAttribute('onclick', 'sendConnectionInProfile(2)'); // Disable click action
+                    rejectButton.style.display = "inline-flex";
+                    rejectButton.querySelector("span").textContent = "Reject";
                 } else {
                     connectImg.src = "images/connect.png"; // Default connect image
                     connectButton.querySelector("span").textContent = "Connect"; // Update the text to "Connect"
@@ -328,24 +335,17 @@ document.addEventListener('DOMContentLoaded', function () {
         const container = document.getElementById("resultsContainer");
         const incomingConn = document.getElementById("incomingConn");
 
-        // myimage.src = data.user[0].uimage;
-        // mycover.src = data.user[0].ucover;
-        // mytitle.innerHTML = data.user[0].utitle;
-        // mydesc.innerHTML = data.user[0].udescription;
         if (Array.isArray(profiles) && profiles.length > 0) {
-            container.innerHTML = ""; // Clear previous content
+            container.innerHTML = "";
         
             profiles.forEach(profile => {
-                // Create the profile card div
                 const profileDiv = document.createElement("div");
                 profileDiv.classList.add("profile-card");
         
-                // Create the anchor element
                 const profileLink = document.createElement("a");
                 profileLink.href = `profile.php?id=${profile.uid}`;
-                profileLink.classList.add("profile-link"); // Optional CSS class
+                profileLink.classList.add("profile-link");
         
-                // Create an image element if the profile has an image
                 if (profile.uimage) {
                     const imageTag = document.createElement("img");
                     imageTag.src = profile.uimage;
@@ -354,36 +354,29 @@ document.addEventListener('DOMContentLoaded', function () {
                     profileDiv.appendChild(imageTag);
                 }
         
-                // Add user info
                 const name = document.createElement("h3");
                 name.textContent = `${profile.ufname} ${profile.ulname}`;
         
-                const email = document.createElement("p");
-                email.textContent = `Email: ${profile.uemail}`;
+                const title = document.createElement("p");
+                title.textContent = `Title: ${profile.utitle || 'No Title'}`;
         
-                const location = document.createElement("p");
-                location.textContent = `Location: ${profile.ulocation || 'Unknown'}`;
-        
-                // Append elements to profileDiv
+                const about = document.createElement("p");
+                about.textContent = `About : ${profile.udescription || 'No about'}`;
+                
                 profileDiv.appendChild(name);
-                profileDiv.appendChild(email);
-                profileDiv.appendChild(location);
-        
-                // Append profileDiv inside the anchor tag
+                profileDiv.appendChild(title);
+                profileDiv.appendChild(about);
                 profileLink.appendChild(profileDiv);
-        
-                // Append the anchor to the container
                 container.appendChild(profileLink);
             });
         
-            // Add spacing between sections
             const breakline = document.createElement("br");
             container.appendChild(breakline);
         }
         
         // **Check if `seconds` has elements before adding the header**
         if (Array.isArray(seconds) && seconds.length > 0) {
-            const header2 = document.createElement("h2");
+            const header2 = document.createElement("h1");
             header2.textContent = "People you may know";
             container.appendChild(header2);
         
@@ -410,16 +403,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const name = document.createElement("h3");
                 name.textContent = `${second.ufname} ${second.ulname}`;
         
-                const email = document.createElement("p");
-                email.textContent = `Email: ${second.uemail}`;
+                const title = document.createElement("p");
+                title.textContent = `Title: ${second.utitle || 'No Title'}`;
         
-                const location = document.createElement("p");
-                location.textContent = `Location: ${second.ulocation || 'Unknown'}`;
+                const about = document.createElement("p");
+                about.textContent = `About: ${second.udescription || 'No about'}`;
         
                 // Append elements to profileDiv
                 profileDiv.appendChild(name);
-                profileDiv.appendChild(email);
-                profileDiv.appendChild(location);
+                profileDiv.appendChild(title);
+                profileDiv.appendChild(about);
         
                 // Append profileDiv inside the anchor tag
                 profileLink.appendChild(profileDiv);
@@ -427,11 +420,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Append the anchor to the container
                 container.appendChild(profileLink);
             });
-        }
-        
-        // Debugging: Check if `seconds` is populated
-        console.log("Seconds:", seconds);
-        
+        }        
 
         if (Array.isArray(incomings) && incomings.length > 0) {
             incomings.forEach(incoming => {
@@ -456,16 +445,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const name = document.createElement("h3");
                 name.textContent = `${incoming.ufname} ${incoming.ulname}`;
         
-                const email = document.createElement("p");
-                email.textContent = `Email: ${incoming.uemail}`;
+                const title = document.createElement("p");
+                title.textContent = `Title: ${incoming.utitle || 'No Title'}`;
         
-                const location = document.createElement("p");
-                location.textContent = `Location: ${incoming.ulocation || 'Unknown'}`;
+                const about = document.createElement("p");
+                about.textContent = `About: ${incoming.udescription || 'No about'}`;
         
                 // Append elements to profileDiv
                 profileDiv.appendChild(name);
-                profileDiv.appendChild(email);
-                profileDiv.appendChild(location);
+                profileDiv.appendChild(title);
+                profileDiv.appendChild(about);
         
                 // Append profileDiv inside the anchor tag
                 profileLink.appendChild(profileDiv);
@@ -474,7 +463,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 incomingConn.appendChild(profileLink);
             });
         } else {
-            incomingConn.innerHTML = "<p>No search results found.</p>";
+            incomingConn.innerHTML = "<h3>Incoming</h3><br><p>No incoming Connections.</p>";
         }
         
 
@@ -895,11 +884,6 @@ function editImage(type) {
     });
 }
 
-
-
-
-
-
 function viewFullImage() {
     const profileImage = document.getElementById("profile-image");
     const imageModal = document.getElementById("imageModal");
@@ -933,27 +917,17 @@ function toggleMenu() {
     menu.classList.toggle("show");
 }
 
-
-
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const navLinks = document.querySelectorAll(".navbar-center ul li a");
-
-    // Initially, ensure the first link has the 'active-link' class (if not set)
-    if (!document.querySelector(".navbar-center ul li a.active-link")) {
-        navLinks[0].classList.add("active-link");
-    }
-
-    // Add click event to each link
+        console.log(navLinks);
     navLinks.forEach(link => {
-        link.addEventListener("click", function() {
-            // Remove 'active-link' class from all links
-            navLinks.forEach(link => {
-                link.classList.remove("active-link");
-                link.querySelector('::after').style.width = "0"; // Reset underline width to 0 for all items
-            });
+        link.addEventListener("click", function () {
+            // Remove 'active-link' from all links
+            navLinks.forEach(nav => nav.classList.remove("active-link"));
 
-            // Add 'active-link' class to the clicked link
+            // Add 'active-link' to the clicked link
             this.classList.add("active-link");
         });
     });
 });
+
