@@ -74,14 +74,6 @@ ORDER BY
     }
 
 
-    // Encode images and ensure UTF-8 encoding as needed
-    foreach ($posts as &$post) {
-        foreach ($post as $key => $value) {
-            //$post[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-        }
-    }
-
-
     function fetchNews(){
         require_once 'vendor/autoload.php';
     

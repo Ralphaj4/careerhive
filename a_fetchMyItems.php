@@ -17,6 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     -- Accurate like and comment counts
     (SELECT COUNT(*) FROM likes WHERE likes.lpost = posts.pid) AS like_count,
     (SELECT COUNT(*) FROM comments WHERE comments.cpost = posts.pid) AS comment_count,
+    (SELECT COUNT(*) FROM saveditems WHERE saveditems.pid = posts.pid) AS saved_count,
 
     -- Check if the user liked the post
     CASE 

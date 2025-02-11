@@ -18,7 +18,27 @@ function formatTimeAgo(dateString) {
   return date.toLocaleString("en-US", options).replace(",", " at");
 }
 
+function formatDateRange(start, end) {
+    let startYear = start.split('-')[0];
+    let endYear = end === null ? "Present" : end.split('-')[0];
+    return `${startYear} - ${endYear}`;
+}
 
+function getCookie(name) {
+    let cookies = document.cookie.split('; ');
+    for (let cookie of cookies) {
+        let [key, value] = cookie.split('=');
+        if (key === name) {
+            return decodeURIComponent(value);
+        }
+    }
+    return null;
+}
+
+function getDecodedCookie(name) {
+    let encodedValue = getCookie(name);
+    return encodedValue ? atob(encodedValue) : null;
+}
 
 document.addEventListener('DOMContentLoaded', function () {
   const submitButton = document.getElementById('submitBtn');
@@ -209,6 +229,41 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
             .catch(error => console.error("Error fetching connection status:", error));
+            fetch('a_fetchNews.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            }).then(response => response.json())
+              .then(data => {
+                console.log('fetched' + data);
+                  const newsContainer = document.getElementById('sidebar-news');
+                  newsContainer.innerHTML = '';
+            
+                  const title = document.createElement('h3');
+                  title.textContent = "Trending News";
+                  newsContainer.appendChild(title);
+                  if (data.articles && data.articles.length > 0) {
+                      for (let i = 0; i < 4; i++) { 
+                          const article = data.articles[i];
+                          console.log(data.articles[i]);
+            
+                          const newsItem = document.createElement("a");
+                          newsItem.href = article.link;
+                          newsItem.innerHTML = `<p>${article.title}</p>`;
+            
+                          const newsMeta = document.createElement("small");
+                          newsMeta.innerHTML = `${article.pubDate} <span>${article.source_id}</span>`;
+            
+                          newsContainer.appendChild(newsItem);
+                          newsContainer.appendChild(newsMeta);
+                      }
+            
+                  } else {
+                      newsContainer.innerHTML = `<div style="display:flex; align-items:center;justify-content: center;height: 70vh;">
+                          <h2>No News Found</h2>
+                      </div>`;
+                  }
+              })
+              .catch(error => console.error('Error fetching news:', error));
     }
 }
 
@@ -274,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             </button>
                         </div>
                         <div class="post-activity-link">
-                            <button onClick=ToggleImage(1, ${post.pid})><img src="images/${post.is_saved}.png" id="togglesave${post.pid}"><span>Save</span></button>
+                            <button onClick="toggleImage(1, ${post.pid})"><img src="images/${post.is_saved}.png" id="togglesave${post.pid}"><span>Save</span></button>
                         </div>
                         
                         <div id="overlay${count}" class="overlay" style="display: none;"></div>
@@ -304,22 +359,461 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
 
-  if(pageType === "myprofile"){
-    fetch('a_fetchMyProfile.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-  }).then(response => response.json())
+  if (pageType === "myprofile") {
+    let uid = getCookie("id");
+
+    fetch('a_fetchProfile.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: uid })
+    })
+    .then(response => response.json())
     .then(data => {
         const myimage = document.getElementById('profile-image');
         const mycover = document.getElementById('cover-image');
         const mytitle = document.getElementById('currentTitle');
         const mydesc = document.getElementById('description');
+
+        // Set profile details
         myimage.src = data.user[0].uimage;
         mycover.src = data.user[0].ucover;
         mytitle.innerHTML = data.user[0].utitle;
         mydesc.innerHTML = data.user[0].udescription;
+
+        // Display Education
+        const educationContainer = document.querySelector(".profile-education-container");
+        educationContainer.innerHTML = `<h2>Education <button class="add-education-btn" id="add-education-btn">+</button></h2>`;
+
+        data.education.forEach(edu => {
+            const educationDiv = document.createElement("div");
+            educationDiv.classList.add("profile-education");
+
+            educationDiv.innerHTML = `
+                <img src="images/university.png" alt="University Logo">
+                <div>
+                    <h3>${edu.iname}</h3>
+                    <b>${edu.mtype}, ${edu.mname}</b>
+                    <b>${formatDateRange(edu.mstart, edu.mend)}</b>
+                    <hr>
+                </div>
+            `;
+            educationContainer.appendChild(educationDiv);
+        });
+
+        const addEducationBtn = document.getElementById("add-education-btn");
+        const popupContainer = document.createElement("div");
+        popupContainer.classList.add("education-popup-container");
+        popupContainer.innerHTML = `
+            <div class="education-popup">
+                <h3>Add Education</h3>
+                <label>School Name: <input type="text" id="school-name" list="school-list"></label>
+                <datalist id="school-list"></datalist>
+                <div class="year-container">
+                    <label>Start Year: <input type="number" id="start-year" min="1900" max="2099"></label>
+                    <label>End Year: <input type="number" id="end-year" min="1900" max="2099"></label>
+                </div>
+                <label>Major: <input type="text" id="major-name" list="major-list"></label>
+                <datalist id="major-list"></datalist>
+                <label>Major Type:
+                    <select id="major-type">
+                        <option value="Bachelor">Bachelor</option>
+                        <option value="Master">Master</option>
+                        <option value="PhD">PhD</option>
+                    </select>
+                </label>
+                <button id="submit-education">Submit</button>
+                <button id="close-popup">Cancel</button>
+            </div>
+        `;
+        document.body.appendChild(popupContainer);
+
+            // Fetch school data from PHP file
+            fetch("a_fetchSchools&Majors.php", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                const schoolList = document.getElementById("school-list");
+                const majorList = document.getElementById("major-list");
+
+                data.schools.forEach(school => {
+                    const option = document.createElement("option");
+                    option.value = school.iname;
+                    schoolList.appendChild(option);
+                });
+
+                data.majors.forEach(major => {
+                    const option = document.createElement("option");
+                    option.value = major.mname;
+                    majorList.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error fetching schools:", error));
+
+        addEducationBtn.addEventListener("click", () => {
+            popupContainer.style.display = "flex";
+        });
+
+        document.getElementById("close-popup").addEventListener("click", () => {
+            popupContainer.style.display = "none";
+            document.getElementById("school-name").value = "";
+            document.getElementById("start-year").value = "";
+            document.getElementById("end-year").value = "";
+            document.getElementById("major-name").value = "";
+        });
+
+        document.getElementById("submit-education").addEventListener("click", () => {
+            const school = document.getElementById("school-name").value;
+            const start = document.getElementById("start-year").value;
+            const end = document.getElementById("end-year").value;
+            const major = document.getElementById("major-name").value;
+            const type = document.getElementById("major-type").value;
+
+            if (school && start && end && major) {
+
+                fetch("a_uploadMajor.php", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        school: school,
+                        start: start,
+                        end: end,
+                        major: major,
+                        type: type
+                    })
+                });
+
+                const newEducation = {
+                    iname: school,
+                    mtype: type,
+                    mname: major,
+                    mstart: start,
+                    mend: end
+                };
+                data.education.push(newEducation);
+
+                const educationDiv = document.createElement("div");
+                educationDiv.classList.add("profile-education");
+                educationDiv.innerHTML = `
+                    <img src="images/university.png" alt="University Logo">
+                    <div>
+                        <h3>${newEducation.iname}</h3>
+                        <b>${newEducation.mtype}, ${newEducation.mname}</b>
+                        <b>${formatDateRange(newEducation.mstart, newEducation.mend)}</b>
+                        <hr>
+                    </div>
+                `;
+                educationContainer.appendChild(educationDiv);
+                popupContainer.style.display = "none";
+            }
+        });
+
+
+
+
+
+
+        // Display Experience
+        const experienceContainer = document.querySelector(".profile-experience-container");
+        experienceContainer.innerHTML = `<h2>Experience <button class="add-experience-btn" id="add-experience-btn">+</button></h2>`;
+
+        data.experience.forEach(exp => {
+            const experienceDiv = document.createElement("div");
+            experienceDiv.classList.add("profile-experience");
+
+            experienceDiv.innerHTML = `
+                <img src="images/company.png" alt="Company Logo">
+                <div>
+                    <h3>${exp.title}</h3>
+                    <b>${exp.iname}</b>
+                    <b>${formatDateRange(exp.wstarted, exp.wended)}</b>
+                    <hr>
+                </div>
+            `;
+            experienceContainer.appendChild(experienceDiv);
+        });
+        const addExperienceBtn = document.getElementById("add-experience-btn");
+        const popupContainerExp = document.createElement("div");
+        popupContainerExp.classList.add("experience-popup-container");
+        popupContainerExp.innerHTML = `
+            <div class="experience-popup">
+                <h3>Add Experience</h3>
+                <label>Company Name: <input type="text" id="company-name" list="company-list"></label>
+                <datalist id="company-list"></datalist>
+                <label>Job Title <input type="text" id="job-title"></label>
+                <div class="year-container">
+                    <label>Start Year: <input type="number" id="start-year" min="1900" max="2099"></label>
+                    <label>End Year: <input type="number" id="end-year" min="1900" max="2099"></label>
+                </div>
+                <button id="submit-experience">Submit</button>
+                <button id="close-popupExp">Cancel</button>
+            </div>
+        `;
+        document.body.appendChild(popupContainerExp);
+
+            // Fetch school data from PHP file
+            fetch("a_fetchInstitutions.php", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                //console.log(data);
+                const ExperienceList = document.getElementById("company-list");
+                data.companies.forEach(company => {
+                    console.log(company.iname);
+                    const option = document.createElement("option");
+                    option.value = company.iname;
+                    ExperienceList.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error fetching companies:", error));
+
+            addExperienceBtn.addEventListener("click", () => {
+                popupContainerExp.style.display = "flex";
+        });
+
+        document.getElementById("close-popupExp").addEventListener("click", () => {
+            popupContainerExp.style.display = "none";
+        });
+
+        // document.getElementById("submit-experience").addEventListener("click", () => {
+        //     const school = document.getElementById("school-name").value;
+        //     const start = document.getElementById("start-year").value;
+        //     const end = document.getElementById("end-year").value;
+        //     const major = document.getElementById("major-name").value;
+        //     const type = document.getElementById("major-type").value;
+
+        //     if (school && start && end && major) {
+        //         const newEducation = {
+        //             iname: school,
+        //             mtype: type,
+        //             mname: major,
+        //             mstart: start,
+        //             mend: end
+        //         };
+        //         data.education.push(newEducation);
+
+        //         const educationDiv = document.createElement("div");
+        //         educationDiv.classList.add("profile-education");
+        //         educationDiv.innerHTML = `
+        //             <img src="images/university.png" alt="University Logo">
+        //             <div>
+        //                 <h3>${newEducation.iname}</h3>
+        //                 <b>${newEducation.mtype}, ${newEducation.mname}</b>
+        //                 <b>${formatDateRange(newEducation.mstart, newEducation.mend)}</b>
+        //                 <hr>
+        //             </div>
+        //         `;
+        //         educationContainer.appendChild(educationDiv);
+        //         popupContainer.style.display = "none";
+        //     }
+        // });
+
+
+
+
+
+        
+        // Add "Show All Experiences" Link
+        const showAllLink = document.createElement("a");
+        showAllLink.href = "#";
+        showAllLink.classList.add("experience-link");
+        showAllLink.innerHTML = `Show all (${data.experience.length}) experiences <img src="images/right-arrow.png">`;
+        experienceContainer.appendChild(showAllLink);
+
+        // Display Skills
+        const skillsContainer = document.querySelector(".profile-skills-container");
+        skillsContainer.innerHTML = `<h2>Skills <button class="add-skill-btn" id="add-skill-btn">+</button></h2>`;
+
+        data.skills.forEach(skill => {
+            const skillp = document.createElement("p");
+            skillp.classList.add("skill");
+
+            skillp.innerHTML = `${skill.skillname}`;
+            skillsContainer.appendChild(skillp);
+        });
+        const addSkillBtn = document.getElementById("add-skill-btn");
+        const popupContainerSkill = document.createElement("div");
+        popupContainerSkill.classList.add("skill-popup-container");
+        popupContainerSkill.innerHTML = `
+            <div class="skill-popup">
+                <h3>Add Skill</h3>
+                <label>Skill: <input type="text" id="skill-name" list="skill-list"></label>
+                <datalist id="skill-list"></datalist>
+                <button id="submit-skill">Submit</button>
+                <button id="close-popupSkill">Cancel</button>
+            </div>
+        `;
+        document.body.appendChild(popupContainerSkill);
+
+            // Fetch school data from PHP file
+            fetch("a_fetchSkills.php", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                const skillList = document.getElementById("skill-list");
+                data.skills.forEach(skill => {
+                    const option = document.createElement("option");
+                    option.value = skill.skillname;
+                    skillList.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error fetching skills:", error));
+
+            addSkillBtn.addEventListener("click", () => {
+                popupContainerSkill.style.display = "flex";
+        });
+
+        document.getElementById("close-popupSkill").addEventListener("click", () => {
+            popupContainerSkill.style.display = "none";
+            document.getElementById("skill-name").value = "";
+        });
+
+        // Display Languages
+        const languagesContainer = document.querySelector(".profile-language-container");
+        languagesContainer.innerHTML = `<h2>Languages <button class="add-language-btn" id="add-language-btn">+</button></h2>`;
+
+        data.languages.forEach(language => {
+            const experiencep = document.createElement("p");
+            experiencep.classList.add("language");
+
+            experiencep.innerHTML = `${language.lname}`;
+            languagesContainer.appendChild(experiencep);
+        });
+        const addLanguageBtn = document.getElementById("add-language-btn");
+        const popupContainerLang = document.createElement("div");
+        popupContainerLang.classList.add("language-popup-container");
+        popupContainerLang.innerHTML = `
+            <div class="language-popup">
+                <h3>Add Language</h3>
+                <label>Language: <input type="text" id="language-name" list="language-list"></label>
+                <datalist id="language-list"></datalist>
+                <button id="submit-language">Submit</button>
+                <button id="close-popupLang">Cancel</button>
+            </div>
+        `;
+        document.body.appendChild(popupContainerLang);
+
+            // Fetch school data from PHP file
+            fetch("a_fetchLanguages.php", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('test');
+                const languageList = document.getElementById("language-list");
+                data.languages.forEach(language => {
+                    const option = document.createElement("option");
+                    option.value = language.lname;
+                    languageList.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error fetching companies:", error));
+
+            addLanguageBtn.addEventListener("click", () => {
+                popupContainerLang.style.display = "flex";
+        });
+
+        document.getElementById("close-popupLang").addEventListener("click", () => {
+            popupContainerLang.style.display = "none";
+            document.getElementById("language-name").value = "";
+        });
+
+
     })
-    .catch(error => console.error('Error fetching news:', error));
+    .catch(error => console.error('Error fetching profile:', error));
+
+    document.body.addEventListener("click", (event) => {
+        if (event.target.id === "submit-language") {
+            const language = document.getElementById('language-name');
+            if (language.value) {
+                let lang = language.value;
+
+                fetch('a_uploadLanguage.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({language: lang})
+                });
+                const newLanguage = {
+                    lname: lang
+                };
+                const langContainer = document.querySelector(".profile-language-container");
+                const popupContainerLang = document.querySelector(".language-popup-container");
+                const langp = document.createElement("p");
+                langp.classList.add("language");
+                langp.textContent = newLanguage.lname;
+                langContainer.appendChild(langp);
+                popupContainerLang.style.display = "none";
+            }
+        }
+    });
+
+    document.body.addEventListener("click", (event) => {
+        if (event.target.id === "submit-skill") {
+            const skill = document.getElementById('skill-name');
+            if (skill.value) {
+                let sk = skill.value;
+                console.log("clicked");
+                fetch('a_uploadSkill.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({skill: sk})
+                });
+
+                const newEducation = {
+                    skillname: sk
+                };
+                const skillsContainer = document.querySelector(".profile-skills-container");
+                const popupContainerSkill = document.querySelector(".skill-popup-container");
+                const skillp = document.createElement("p");
+                skillp.classList.add("skill");
+                skillp.textContent = newEducation.skillname;
+                skillsContainer.appendChild(skillp);
+                popupContainerSkill.style.display = "none";
+        }
+        }
+    });
+    
+    fetch('a_fetchNews.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    }).then(response => response.json())
+      .then(data => {
+        console.log('fetched' + data);
+          const newsContainer = document.getElementById('sidebar-news');
+          newsContainer.innerHTML = '';
+    
+          const title = document.createElement('h3');
+          title.textContent = "Trending News";
+          newsContainer.appendChild(title);
+          if (data.articles && data.articles.length > 0) {
+              for (let i = 0; i < 4; i++) { 
+                  const article = data.articles[i];
+                  console.log(data.articles[i]);
+    
+                  const newsItem = document.createElement("a");
+                  newsItem.href = article.link;
+                  newsItem.innerHTML = `<p>${article.title}</p>`;
+    
+                  const newsMeta = document.createElement("small");
+                  newsMeta.innerHTML = `${article.pubDate} <span>${article.source_id}</span>`;
+    
+                  newsContainer.appendChild(newsItem);
+                  newsContainer.appendChild(newsMeta);
+              }
+    
+          } else {
+              newsContainer.innerHTML = `<div style="display:flex; align-items:center;justify-content: center;height: 70vh;">
+                  <h2>No News Found</h2>
+              </div>`;
+          }
+      })
+      .catch(error => console.error('Error fetching news:', error));
   }
 
 
@@ -469,6 +963,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     })
     .catch(error => console.error('Error fetching network:', error));
+
+    
   }
 
 
@@ -524,9 +1020,20 @@ document.addEventListener('DOMContentLoaded', function () {
         // Wait until the image fades out before switching the source
         setTimeout(function() {
         if (img.src.includes("saved")) {
+            fetch('a_savePost.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 0, postid: pid })
+            })
             img.src = "images/save.png";  // Change to the "liked" image
         } else {
-            img.src = "images/saved.png";        }
+            fetch('a_savePost.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 1, postid: pid })
+            })
+            img.src = "images/saved.png";        
+        }
         
         // Fade the image back in after switching the source
         img.style.opacity = 1;

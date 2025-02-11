@@ -1,8 +1,10 @@
 <?php
-if(!isset($_COOKIE['id'])){
-    header("Location: index.php");
-    exit;
-}
+// if(!isset($_COOKIE['id'])){
+//     header("Location: login.php");
+//     exit;
+// }
+
+use function PHPSTORM_META\type;
 
 function storeInSession($id){
     require('database.php');
@@ -135,6 +137,24 @@ function handleTime($dateString) {
         }
     }
     return $date->format("F jS \a\\t H:i");
+}
+
+function IsCompany($email) {
+    require('database.php');
+
+    // Prepare statement
+    $stmt = $conn->prepare("SELECT iid FROM institutions WHERE iemail = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+
+    // Bind result to variable
+    $stmt->bind_result($iid);
+    $stmt->fetch();
+
+    // Close statement
+    $stmt->close();
+    // Return true if an IID was found, otherwise false
+    return $iid ? $iid : false;
 }
 
 ?>

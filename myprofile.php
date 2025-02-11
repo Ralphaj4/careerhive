@@ -94,14 +94,9 @@ $connections = getConnectionCount($userId);
             <div class="profile-experience">
                 <img src = "images/microsoft.png">
                 <div>
-                    <h3> Lead Front-End Developer</h3>
-                    <b>Microsoft &middot; Full-time</b>
-                    <b>Feb 2021 - Present &middot; 1.5 years</b>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
-                    <hr>
                 </div>
             </div>
-            <a href="#" class="experience-link" > Show all (count of experiences) experiences <img src="images/right-arrow.png"></a>
+            <a href="#" class="experience-link" ><img src="images/right-arrow.png"></a>
         </div>
 
         <div class="profile-education-container">
@@ -119,21 +114,9 @@ $connections = getConnectionCount($userId);
 
 
         <div class="profile-skills-container">
-            <h2>Skills</h2>
-            <a href="#" class="skill">C#</a>
-            <a href="#" class="skill">Java</a>
-            <a href="#" class="skill">Php</a>
-            <a href="#" class="skill">C</a>
-            <a href="#" class="skill">JS</a>
-            <a href="#" class="skill">HTML</a>
-            <a href="#" class="skill">CSS</a>
         </div>
 
         <div class="profile-language-container">
-            <h2>Languages</h2>
-            <a href="#" class="language">English</a>
-            <a href="#" class="language">Portuguese</a>
-            <a href="#" class="language">Arabic</a>
         </div>
     </div>
     </div>

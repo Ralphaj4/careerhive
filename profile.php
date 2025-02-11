@@ -64,8 +64,15 @@ echo '
         </div>
 
         <div class="profile-sidebar"></div>
+        
+    </div>
+    <div class="profile-sidebar">
+        <div class="sidebar-news" id="sidebar-news">
+            <h3>Trending News</h3>
+        </div>
     </div>
 </div>
 <script src="scripts.js"></script>
 ';
+
 ?>

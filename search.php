@@ -18,62 +18,78 @@ require('navbar.php'); ?>
     <div id="resultsContainer"></div> <!-- Placeholder for search results -->
 
     <script>
+        function getCookie(name) {
+            let cookies = document.cookie.split('; ');
+            for (let cookie of cookies) {
+                let [key, value] = cookie.split('=');
+                if (key === name) {
+                    return decodeURIComponent(value);
+                }
+            }
+            return null;
+        }
+
+        function getDecodedCookie(name) {
+            let encodedValue = getCookie(name);
+            return encodedValue ? atob(encodedValue) : null;
+        }
         const searchbox = document.getElementById('search');
 
-    searchbox.addEventListener("click", function() {
-    searchInput = document.getElementById('searchInput')
-    const userInput = searchInput.value;
-    const parts = userInput.split(/\s+/); // Splits by one or more spaces
-    let requestData = { fname: "", lname: "" };
+        searchbox.addEventListener("click", function() {
+        searchInput = document.getElementById('searchInput')
+        const userInput = searchInput.value;
+        const parts = userInput.split(/\s+/); // Splits by one or more spaces
+        let requestData = { fname: "", lname: "" };
 
-    if (parts.length >= 2) {
-        requestData.fname = parts[0]; // First name
-        requestData.lname = parts.slice(1).join(" "); // Remaining words as last name
-    } else {
-        requestData.fname = userInput; // If only one word, it's the first name
-    }
+        if (parts.length >= 2) {
+            requestData.fname = parts[0]; // First name
+            requestData.lname = parts.slice(1).join(" "); // Remaining words as last name
+        } else {
+            requestData.fname = userInput; // If only one word, it's the first name
+        }
 
-    fetch('a_retrieveProfiles.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        sessionStorage.removeItem("searchResults");
-        sessionStorage.setItem("searchResults", JSON.stringify(data));
-        window.location.href = `search.php`;
+        fetch('a_retrieveProfiles.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestData)
         })
-        .catch(console.error);
-    });
-
-    const searchResults = JSON.parse(sessionStorage.getItem("searchResults"));
-
-    if (searchResults && searchResults.profiles) {
-        const container = document.getElementById("resultsContainer");
-
-        searchResults.profiles.forEach(profile => {
-            const profileDiv = document.createElement("div");
-            profileDiv.classList.add("profile-card"); // Optional: Add CSS class
-
-            // Create an image element if the profile has an image
-            let imageTag = "";
-            if (profile.uimage) {
-                imageTag = `<a href="profile.php?id=${profile.uid}"><img src="${profile.uimage}" alt="User Image" class="profile-img"></a>`;
-            }
-
-            // Fill the div with user info
-            profileDiv.innerHTML = `
-                ${imageTag}
-                <h3><a href="profile.php?id=${profile.uid}">${profile.ufname} ${profile.ulname}<a></h3>
-                <p>About: ${profile.udescription|| 'No about'}</p>
-            `;
-
-            container.appendChild(profileDiv);
+        .then(response => response.json())
+        .then(data => {
+            sessionStorage.removeItem("searchResults");
+            sessionStorage.setItem("searchResults", JSON.stringify(data));
+            window.location.href = `search.php`;
+            })
+            .catch(console.error);
         });
-    } else {
-        document.getElementById("resultsContainer").innerHTML = "<p>No search results found.</p>";
-    }
+
+        const searchResults = JSON.parse(sessionStorage.getItem("searchResults"));
+
+        if (searchResults && searchResults.profiles) {
+            const container = document.getElementById("resultsContainer");
+            const cookieid = getDecodedCookie('id');
+            searchResults.profiles.forEach(profile => {
+                if (String(atob(decodeURIComponent(profile.uid))).trim() !== String(cookieid).trim()) { 
+                const profileDiv = document.createElement("div");
+                profileDiv.classList.add("profile-card"); 
+                
+                let imageTag = "";
+                if (profile.uimage) {
+                    imageTag = `<a href="profile.php?id=${profile.uid}"><img src="${profile.uimage}" alt="User Image" class="profile-img"></a>`;
+                }
+
+                // Fill the div with user info
+                profileDiv.innerHTML = `
+                    ${imageTag}
+                    <h3><a href="profile.php?id=${profile.uid}">${profile.ufname} ${profile.ulname}<a></h3>
+                    <p>About: ${profile.udescription|| 'No about'}</p>
+                `;
+
+                container.appendChild(profileDiv);
+            }
+            });
+        } else {
+            document.getElementById("resultsContainer").innerHTML = "<p>No search results found.</p>";
+        }
 </script>
 
 </body>

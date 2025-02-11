@@ -2,6 +2,7 @@
 // Start the session
 session_start();
 setcookie("id", "", time() - 3600, "/");
+setcookie("inst", "", time() - 3600, "/");
 // Destroy all session data
 session_unset();
 session_destroy();

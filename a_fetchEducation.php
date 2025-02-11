@@ -4,20 +4,17 @@ ini_set('display_errors', 1);
 require('database.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $userId = base64_decode($_COOKIE['id']);
-    $profileId = $_GET['profileId'];
+    $input = json_decode(file_get_contents('php://input'), true);
+    $userId = $input['id'] ?? null;
 
-    if (!$userId || !$profileId) {
+    if (!$userId) {
         echo json_encode(['success' => false, 'error' => 'Invalid input']);
         exit;
     }
 
-    $stmt = $conn->prepare("SELECT 
-    csender, creceiver, cstatus 
-    FROM 
-        connections 
-    WHERE 
-        (csender = ? AND creceiver = ?) OR (csender = ? AND creceiver = ?)");
+    $stmt = $conn->prepare("SELECT * FROM
+    
+    ");
 
     $stmt->bind_param('iiii', $userId, $profileId, $profileId, $userId);
     $stmt->execute();
