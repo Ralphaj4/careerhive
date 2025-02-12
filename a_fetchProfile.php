@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $posts = $result_posts->fetch_all(MYSQLI_ASSOC); // Fetch as associative array
     $stmt_posts->close();
 
-    $stmt_user = $conn->prepare("SELECT users.uimage, users.ucover, users.udescription, users.utitle 
+    $stmt_user = $conn->prepare("SELECT users.ufname, users.ulname, users.uimage, users.ucover, users.udescription, users.utitle 
     FROM users WHERE uid = ?");
     $stmt_user->bind_param("i", $id);
     if (!$stmt_user->execute()) {

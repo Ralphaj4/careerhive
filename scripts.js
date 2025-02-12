@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function () {
   .catch(error => console.error('Error fetching news:', error));
   }
 
-  if (pageType === 'profile') {
+  if (pageType === "profile") {
     const urlParams = new URLSearchParams(window.location.search);
     const profileUserId = atob(urlParams.get("id")); // Profile user ID from the URL
     const rejectButton = document.getElementById("reject");
@@ -229,6 +229,87 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
             .catch(error => console.error("Error fetching connection status:", error));
+            fetch('a_fetchProfile.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({id: profileUserId})
+            }).then(response => response.json())
+            .then(data => {
+                const educationContainer = document.querySelector(".profile-education-container");
+                educationContainer.innerHTML = `<h2>Education</h2>`;
+                const experienceContainer = document.querySelector(".profile-experience-container");
+                experienceContainer.innerHTML = `<h2>Experience</h2>`;
+                const skillsContainer = document.querySelector(".profile-skills-container");
+                skillsContainer.innerHTML = `<h2>Skills</h2>`;
+                const languagesContainer = document.querySelector(".profile-language-container");
+                languagesContainer.innerHTML = `<h2>Languages</h2>`;
+                
+                // Display Education
+                if (!data.education || data.education.length === 0) {
+                    // Show message if there is no education data
+                    educationContainer.innerHTML += `<p>Nothing to display.</p>`;
+                } else {
+                    data.education.forEach(edu => {
+                        const educationDiv = document.createElement("div");
+                        educationDiv.classList.add("profile-education");
+            
+                        educationDiv.innerHTML = `
+                            <img src="${edu.iimage}" alt="University Logo">
+                            <div>
+                                <h3>${edu.iname}</h3>
+                                <b>${edu.mtype}, ${edu.mname}</b>
+                                <b>${formatDateRange(edu.mstart, edu.mend)}</b>
+                                <hr>
+                            </div>
+                        `;
+                        educationContainer.appendChild(educationDiv);
+                    });
+                }
+                if(!data.experience || data.experience.length === 0){
+                    experienceContainer.innerHTML += `<p>Nothing to display.</p>`
+                }
+                else{
+                    data.experience.forEach(exp => {
+                    const experienceDiv = document.createElement("div");
+                    experienceDiv.classList.add("profile-experience");
+
+                    experienceDiv.innerHTML = `
+                        <img src="${exp.iimage}" alt="Company Logo">
+                        <div>
+                            <h3>${exp.title}</h3>
+                            <b>${exp.iname}</b>
+                            <b>${formatDateRange(exp.wstarted, exp.wended)}</b>
+                            <hr>
+                        </div>
+                    `;
+                    experienceContainer.appendChild(experienceDiv);
+                    });
+                }
+                if(!data.skills || data.skills.length=== 0){
+                    skillsContainer.innerHTML += `Nothing to display.`;
+                }else{
+                    data.skills.forEach(skill => {
+                        const skillp = document.createElement("p");
+                        skillp.classList.add("skill");
+            
+                        skillp.innerHTML = `${skill.skillname}`;
+                        skillsContainer.appendChild(skillp);
+                    });
+                }
+
+                if(!data.languages || data.languages.length=== 0){
+                    languagesContainer.innerHTML += `Nothing to display.`;
+                }else{
+                    data.languages.forEach(language => {
+                        const experiencep = document.createElement("p");
+                        experiencep.classList.add("language");
+            
+                        experiencep.innerHTML = `${language.lname}`;
+                        languagesContainer.appendChild(experiencep);
+                    });
+                }
+            })
+            ;
             fetch('a_fetchNews.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
@@ -389,7 +470,7 @@ document.addEventListener('DOMContentLoaded', function () {
             educationDiv.classList.add("profile-education");
 
             educationDiv.innerHTML = `
-                <img src="images/university.png" alt="University Logo">
+                <img src="${edu.iimage}" alt="University Logo">
                 <div>
                     <h3>${edu.iname}</h3>
                     <b>${edu.mtype}, ${edu.mname}</b>
@@ -523,7 +604,7 @@ document.addEventListener('DOMContentLoaded', function () {
             experienceDiv.classList.add("profile-experience");
 
             experienceDiv.innerHTML = `
-                <img src="images/company.png" alt="Company Logo">
+                <img src="${exp.iimage}" alt="Company Logo">
                 <div>
                     <h3>${exp.title}</h3>
                     <b>${exp.iname}</b>
@@ -539,8 +620,8 @@ document.addEventListener('DOMContentLoaded', function () {
         popupContainerExp.innerHTML = `
             <div class="experience-popup">
                 <h3>Add Experience</h3>
-                <label>Company Name: <input type="text" id="company-name" list="company-list"></label>
-                <datalist id="company-list"></datalist>
+                <label>Company Name: <input type="text" id="experience-name" list="experience-list"></label>
+                <datalist id="experience-list"></datalist>
                 <label>Job Title <input type="text" id="job-title"></label>
                 <div class="year-container">
                     <label>Start Year: <input type="number" id="start-year" min="1900" max="2099"></label>
@@ -560,9 +641,8 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 //console.log(data);
-                const ExperienceList = document.getElementById("company-list");
+                const ExperienceList = document.getElementById("experience-list");
                 data.companies.forEach(company => {
-                    console.log(company.iname);
                     const option = document.createElement("option");
                     option.value = company.iname;
                     ExperienceList.appendChild(option);
@@ -705,7 +785,6 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => response.json())
             .then(data => {
-                console.log('test');
                 const languageList = document.getElementById("language-list");
                 data.languages.forEach(language => {
                     const option = document.createElement("option");
@@ -723,7 +802,8 @@ document.addEventListener('DOMContentLoaded', function () {
             popupContainerLang.style.display = "none";
             document.getElementById("language-name").value = "";
         });
-
+        // ADD MY POSTS
+        
 
     })
     .catch(error => console.error('Error fetching profile:', error));
@@ -758,7 +838,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const skill = document.getElementById('skill-name');
             if (skill.value) {
                 let sk = skill.value;
-                console.log("clicked");
                 fetch('a_uploadSkill.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -784,7 +863,6 @@ document.addEventListener('DOMContentLoaded', function () {
         headers: { 'Content-Type': 'application/json' }
     }).then(response => response.json())
       .then(data => {
-        console.log('fetched' + data);
           const newsContainer = document.getElementById('sidebar-news');
           newsContainer.innerHTML = '';
     
@@ -1132,7 +1210,7 @@ function getComments(id, pid) {
 
 function postComment(count, id){
     const postComment = document.getElementById("sendComment" + id);
-    console.log(id); 
+    //console.log(id); 
     const userInput = document.getElementById('userComment' + count);
     const userComment = userInput.value
     fetch('a_postComment.php', {
@@ -1181,7 +1259,7 @@ function uploadDescription(id) {
     })
         .then(response => response.text())  // Get the text response from the server
         .then(data => {
-            console.log("Server response:", data);
+            //console.log("Server response:", data);
 
             // Check if the description was saved successfully by the server
             if (data === "Data saved successfully!") {
@@ -1266,7 +1344,6 @@ function sendConnectionInProfile(type) {
     var id = getCookie("id");
     const urlParams = new URLSearchParams(window.location.search);
     const encodedId = urlParams.get("id");
-    console.log(type);
     if (encodedId) {
         const decodedId = atob(encodedId);
         fetch('a_sendConnection.php', {
@@ -1375,7 +1452,6 @@ function editImage(type) {
                 })
                 .then((response) => response.json())
                 .then((data) => {
-                    console.log(data);
 
                     // Reload the page after the image is set
                     location.reload();  // This will reload the page
@@ -1426,7 +1502,7 @@ function toggleMenu() {
 
 document.addEventListener("DOMContentLoaded", function () {
     const navLinks = document.querySelectorAll(".navbar-center ul li a");
-        console.log(navLinks);
+        //console.log(navLinks);
     navLinks.forEach(link => {
         link.addEventListener("click", function () {
             // Remove 'active-link' from all links

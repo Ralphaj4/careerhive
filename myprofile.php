@@ -90,26 +90,9 @@ $connections = getConnectionCount($userId);
         </div>
         
         <div class="profile-experience-container">
-            <h2>Experience</h2>
-            <div class="profile-experience">
-                <img src = "images/microsoft.png">
-                <div>
-                </div>
-            </div>
-            <a href="#" class="experience-link" ><img src="images/right-arrow.png"></a>
         </div>
 
         <div class="profile-education-container">
-            <h2>Education</h2>
-            <div class="profile-education">
-                <img src = "images/stanford.png">
-                <div>
-                    <h3>Stanford University</h3>
-                    <b>BSEE, Electrical Engineering </b>
-                    <b>2018 - 2022 </b>
-                    <hr>
-                </div>
-            </div>
         </div>
 
 

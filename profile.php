@@ -62,7 +62,18 @@ echo '
                 <textarea id="description" name="description" rows="5" placeholder="No About" disabled>'.$user['udescription'].'</textarea>
             </div>
         </div>
+        <div class="profile-experience-container">
+        </div>
 
+        <div class="profile-education-container">
+        </div>
+
+
+        <div class="profile-skills-container">
+        </div>
+
+        <div class="profile-language-container">
+        </div>
         <div class="profile-sidebar"></div>
         
     </div>
