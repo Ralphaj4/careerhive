@@ -37,10 +37,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <img src="images/network.png"><span>My Network</span></a></li>
             <li><a href="jobs.php" class="<?= $current_page == 'jobs.php' ? 'active-link' : '' ?>">
                 <img src="images/jobs.png"><span>Jobs</span></a></li>
-            <li><a href="messaging.php" class="<?= $current_page == 'messaging.php' ? 'active-link' : '' ?>">
+            <!-- <li><a href="messaging.php" class="<?= $current_page == 'messaging.php' ? 'active-link' : '' ?>">
                 <img src="images/message.png"><span>Messaging</span></a></li>
             <li><a href="notifications.php" class="<?= $current_page == 'notifications.php' ? 'active-link' : '' ?>">
-                <img src="images/notification.png"><span>Notifications</span></a></li>
+                <img src="images/notification.png"><span>Notifications</span></a></li> -->
         </ul>
     </div>
 

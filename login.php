@@ -1,8 +1,8 @@
 <?php
-// if(isset($_COOKIE['id'])){
-//     header("Location: home.php");
-//     exit;
-// }
+if(isset($_COOKIE['id'])){
+    header("Location: home.php");
+    exit;
+}
 // Include database connection file
 require("database.php");
 require("functions.php");
@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $cookieExpire = time() + (60 * 24 * 60 * 60);
                 setcookie("id",base64_encode($iid), $cookieExpire, "/");
                 setcookie("inst","1", $cookieExpire, "/");
-                header("Location: jobs.php");
+                header("Location: mypage.php");
                 exit;
             } else{
                 // Login success: start session and redirect to dashboard

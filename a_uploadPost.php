@@ -6,6 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Initialize $imageData in case no image is uploaded
     $imageData = null;
 
+    
     // Handling image upload
     if (isset($_FILES['photoInput'])) {
         $image = $_FILES['photoInput'];

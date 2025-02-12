@@ -243,7 +243,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 skillsContainer.innerHTML = `<h2>Skills</h2>`;
                 const languagesContainer = document.querySelector(".profile-language-container");
                 languagesContainer.innerHTML = `<h2>Languages</h2>`;
-                
+                const postsContainer = document.querySelector(".profile-post-container");
+                postsContainer.innerHTML = `<h2>Posts</h2>`;
+
                 // Display Education
                 if (!data.education || data.education.length === 0) {
                     // Show message if there is no education data
@@ -286,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                 }
                 if(!data.skills || data.skills.length=== 0){
-                    skillsContainer.innerHTML += `Nothing to display.`;
+                    skillsContainer.innerHTML += `<p>Nothing to display.</p>`;
                 }else{
                     data.skills.forEach(skill => {
                         const skillp = document.createElement("p");
@@ -297,8 +299,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                 }
 
-                if(!data.languages || data.languages.length=== 0){
-                    languagesContainer.innerHTML += `Nothing to display.`;
+                if(!data.languages || data.languages.length === 0){
+                    languagesContainer.innerHTML += `<p>Nothing to display.</p>`;
                 }else{
                     data.languages.forEach(language => {
                         const experiencep = document.createElement("p");
@@ -307,6 +309,92 @@ document.addEventListener('DOMContentLoaded', function () {
                         experiencep.innerHTML = `${language.lname}`;
                         languagesContainer.appendChild(experiencep);
                     });
+                }
+                if(!data.posts || data.posts.length === 0){
+                    postsContainer.innerHTML += `<p>No Posts</p>`;
+                }else{
+                    // ADD MY POSTS
+                    
+
+                    if (data.posts.length > 0) {
+                        let count = 1;
+                    
+                        data.posts.forEach((post) => {
+                            const postElement = document.createElement("div");
+                            postElement.classList.add("post");
+                            postElement.innerHTML = `
+                            <div class="post-header">
+                                <div class="post-author">
+                                    <a href="profile.php?id=${encodeURIComponent(btoa(post.uid))}">
+                                        <img src="${post.uimage}" alt="">
+                                    </a>
+                                    <div>
+                                        <a href="profile.php?id=${encodeURIComponent(btoa(post.uid))}" style="text-decoration: none; color: inherit;">
+                                            <h1>${post.ufname} ${post.ulname}</h1>
+                                        </a>
+                                        <small>${post.utitle}</small>
+                                        <small>${formatTimeAgo(post.pcreation)}</small>
+                                    </div>
+                                </div>
+                            </div>
+                                <p>${post.ptext}</p>
+                                ${post.pimage ? `<img src="${post.pimage}" alt="" width="100%" />` : ""}
+                                
+                                <div class="post-stats">
+                                    <div>
+                                        <img src="images/thumbsup.png">
+                                        <img src="images/love.png">
+                                        <img src="images/clap.png">
+                                        <span class="liked-users">${post.like_count} likes</span>
+                                    </div>
+                                    <div>
+                                        <span>${post.comment_count} comments &middot; ${post.saved_count} saves</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="post-activity">
+                                    <div>
+                                        <img src="${post.uimage}" alt="" class="post-activity-user-icon">
+                                        <img src="images/down-arrow.png" class="post-activity-arrow-icon">
+                                    </div>
+                                    <div class="post-activity-link">
+                                        <button id="like" class="like" onClick="toggleImage(0, ${post.pid})" data-postid="${post.pid}">
+                                            <img src="images/${post.is_liked}.png" id="toggleImage${post.pid}">
+                                            <span>Like</span>
+                                        </button>
+                                    </div>
+                                    <div class="post-activity-link">
+                                        <button id="showCommentBox${count}" class="comment-post" onClick="showComments(${count},${post.pid})" data-postid="${post.pid}">
+                                            <img src="images/comment.png">
+                                            <span>Comment</span>
+                                        </button>
+                                    </div>
+                                    <div class="post-activity-link">
+                                        <button onClick=toggleImage(1,${post.pid})><img src="images/${post.is_saved}.png" id="togglesave${post.pid}"><span>Save</span></button>
+                                    </div>
+                                    
+                                    <div id="overlay${count}" class="overlay" style="display: none;"></div>
+                                    <div id="whiteBox${count}" class="white-box" style="display: none;">
+                                        <div>
+                                            <button id="close-Comments" class="close-Comments" onClick="toggleVisibility(false, ${count}, 0)"><p>X</p></button>
+                                        </div>
+                                        <div class="comments-container" id="comments-container${count}">
+                                            <p>Comments will appear here...</p>
+                                        </div>
+                                        <div>
+                                            <textarea id="userComment${count}" class="userComment" name="userComment" rows="1" placeholder="Type a comment"></textarea>
+                                            <button id="sendComment${post.pid}" class="sendComment" onClick="postComment(${count},${post.pid})"><img src="images/send.png"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                    
+                            postsContainer.appendChild(postElement);
+                            count++;
+                        });
+                    } else {
+                        postsContainer.innerHTML = '<div style="display:flex; align-items:center;justify-content: center;height: 70vh;"><h2>No Posts Found</h2></div>';
+                    }
                 }
             })
             ;
@@ -710,8 +798,8 @@ document.addEventListener('DOMContentLoaded', function () {
         data.skills.forEach(skill => {
             const skillp = document.createElement("p");
             skillp.classList.add("skill");
-
-            skillp.innerHTML = `${skill.skillname}`;
+            skillp.dataset.skillname = skill.skillname;
+            skillp.innerHTML = `${skill.skillname}<button class="delete-skill">X</button>`;
             skillsContainer.appendChild(skillp);
         });
         const addSkillBtn = document.getElementById("add-skill-btn");
@@ -758,11 +846,11 @@ document.addEventListener('DOMContentLoaded', function () {
         languagesContainer.innerHTML = `<h2>Languages <button class="add-language-btn" id="add-language-btn">+</button></h2>`;
 
         data.languages.forEach(language => {
-            const experiencep = document.createElement("p");
-            experiencep.classList.add("language");
-
-            experiencep.innerHTML = `${language.lname}`;
-            languagesContainer.appendChild(experiencep);
+            const languagep = document.createElement("p");
+            languagep.classList.add("language");
+            languagep.dataset.lname = language.lname;
+            languagep.innerHTML = `${language.lname}<button class="delete-language">X</button>`;
+            languagesContainer.appendChild(languagep);
         });
         const addLanguageBtn = document.getElementById("add-language-btn");
         const popupContainerLang = document.createElement("div");
@@ -803,6 +891,104 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById("language-name").value = "";
         });
         // ADD MY POSTS
+        const postsContainer = document.querySelector(".profile-post-container");
+        postsContainer.innerHTML = `<h2>Posts</h2>`;
+
+        if (data.posts.length > 0) {
+            let count = 1;
+        
+            data.posts.forEach((post) => {
+                const postElement = document.createElement("div");
+                postElement.classList.add("post");
+                postElement.innerHTML = `
+                <div class="post-header">
+                    <div class="post-author">
+                        <a href="profile.php?id=${encodeURIComponent(btoa(post.uid))}">
+                            <img src="${post.uimage}" alt="">
+                        </a>
+                        <div>
+                            <a href="profile.php?id=${encodeURIComponent(btoa(post.uid))}" style="text-decoration: none; color: inherit;">
+                                <h1>${post.ufname} ${post.ulname}</h1>
+                            </a>
+                            <small>${post.utitle}</small>
+                            <small>${formatTimeAgo(post.pcreation)}</small>
+                        </div>
+                    </div>
+                    <button class="delete-post" data-postid="${post.pid}">
+                        <img src="images/delete.png" alt="Delete">
+                    </button>
+                </div>
+                    <p>${post.ptext}</p>
+                    ${post.pimage ? `<img src="${post.pimage}" alt="" width="100%" />` : ""}
+                    
+                    <div class="post-stats">
+                        <div>
+                            <img src="images/thumbsup.png">
+                            <img src="images/love.png">
+                            <img src="images/clap.png">
+                            <span class="liked-users">${post.like_count} likes</span>
+                        </div>
+                        <div>
+                            <span>${post.comment_count} comments &middot; ${post.saved_count} saves</span>
+                        </div>
+                    </div>
+                    
+                    <div class="post-activity">
+                        <div>
+                            <img src="${post.uimage}" alt="" class="post-activity-user-icon">
+                            <img src="images/down-arrow.png" class="post-activity-arrow-icon">
+                        </div>
+                        <div class="post-activity-link">
+                            <button id="like" class="like" onClick="toggleImage(0, ${post.pid})" data-postid="${post.pid}">
+                                <img src="images/${post.is_liked}.png" id="toggleImage${post.pid}">
+                                <span>Like</span>
+                            </button>
+                        </div>
+                        <div class="post-activity-link">
+                            <button id="showCommentBox${count}" class="comment-post" onClick="showComments(${count},${post.pid})" data-postid="${post.pid}">
+                                <img src="images/comment.png">
+                                <span>Comment</span>
+                            </button>
+                        </div>
+                        <div class="post-activity-link">
+                            <button onClick=toggleImage(1,${post.pid})><img src="images/${post.is_saved}.png" id="togglesave${post.pid}"><span>Save</span></button>
+                        </div>
+                        
+                        <div id="overlay${count}" class="overlay" style="display: none;"></div>
+                        <div id="whiteBox${count}" class="white-box" style="display: none;">
+                            <div>
+                                <button id="close-Comments" class="close-Comments" onClick="toggleVisibility(false, ${count}, 0)"><p>X</p></button>
+                            </div>
+                            <div class="comments-container" id="comments-container${count}">
+                                <p>Comments will appear here...</p>
+                            </div>
+                            <div>
+                                <textarea id="userComment${count}" class="userComment" name="userComment" rows="1" placeholder="Type a comment"></textarea>
+                                <button id="sendComment${post.pid}" class="sendComment" onClick="postComment(${count},${post.pid})"><img src="images/send.png"></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        
+                postsContainer.appendChild(postElement);
+                count++;
+            });
+
+            // Add event listener for deleting posts
+            document.querySelectorAll(".delete-post").forEach((btn) => {
+                btn.addEventListener("click", function () {
+                    const postId = this.getAttribute("data-postid");
+                    console.log(postId);
+                    fetch('a_deletePost.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({postId: postId})     
+                    })
+                });
+            });
+        } else {
+            postsContainer.innerHTML = '<div style="display:flex; align-items:center;justify-content: center;height: 70vh;"><h2>No Posts Found</h2></div>';
+        }
         
 
     })
@@ -841,7 +1027,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetch('a_uploadSkill.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({skill: sk})
+                    body: JSON.stringify({ type: 1, skill: sk})
                 });
 
                 const newEducation = {
@@ -856,7 +1042,36 @@ document.addEventListener('DOMContentLoaded', function () {
                 popupContainerSkill.style.display = "none";
         }
         }
+
+        // Handle skill deletion
+        if (event.target.classList.contains("delete-skill")) {
+            const skillElement = event.target.closest(".skill");
+            const skillName = skillElement.dataset.skillname;
+            //console.log(skillName);
+            fetch("a_uploadSkill.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ type: 0, skill: skillName })
+            });
+
+            skillElement.remove();
+        }
+
+        // Handle language deletion
+        if (event.target.classList.contains("delete-language")) {
+            const langElement = event.target.closest(".language");
+            const lname = langElement.dataset.lname;
+            //console.log(skillName);
+            fetch("a_uploadLanguage.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ type: 0, language: lname })
+            });
+
+            langElement.remove();
+        }
     });
+    
     
     fetch('a_fetchNews.php', {
         method: 'POST',

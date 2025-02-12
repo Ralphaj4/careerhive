@@ -74,6 +74,8 @@ echo '
 
         <div class="profile-language-container">
         </div>
+        <div class="profile-post-container">
+        </div>
         <div class="profile-sidebar"></div>
         
     </div>

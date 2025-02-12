@@ -1331,6 +1331,7 @@ nav.navbar{
 }
 
 .skill{
+    position: relative;
     display: inline-block;
     margin: 10px 5px;
     padding: 6px 18px;
@@ -1340,19 +1341,58 @@ nav.navbar{
     font-weight: 500;
 }
 
+.delete-skill {
+    display: none;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: red;
+    color: white;
+    border: none;
+    padding: 2px 5px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.skill:hover .delete-skill {
+    display: inline-block;
+}
+
 .profile-language-container{
     background-color: white;
     padding: 15px;
     margin-top: 20px;
 }
 
+
 .language{
+    position: relative;
     display: inline-block;
     margin: 10px 5px;
     padding: 6px 18px;
-    background: #e4e6eb;
+    border: 1px solid #777;
+    border-radius: 30px;
     font-size: 12px;
     font-weight: 500;
+}
+
+.delete-language {
+    display: none;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: red;
+    color: white;
+    border: none;
+    padding: 2px 5px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.language:hover .delete-language {
+    display: inline-block;
 }
 
 /* + Button */
@@ -1738,4 +1778,29 @@ input[list] {
 
 #close-popupSkill:hover {
     background-color: #999;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.delete-post {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.delete-post img {
+    width: 20px;
+    height: 20px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.delete-post:hover img {
+    opacity: 1;
 }

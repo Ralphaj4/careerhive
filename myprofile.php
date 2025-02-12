@@ -95,12 +95,15 @@ $connections = getConnectionCount($userId);
         <div class="profile-education-container">
         </div>
 
-
         <div class="profile-skills-container">
         </div>
 
         <div class="profile-language-container">
         </div>
+
+        <div class="profile-post-container">
+        </div>
+        
     </div>
     </div>
     <div class="profile-sidebar">

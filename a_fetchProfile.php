@@ -4,18 +4,62 @@ require('database.php');
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $input = json_decode(file_get_contents('php://input'), true);
     $id = $input['id'] ?? null;
-    $stmt_posts = $conn->prepare("SELECT * from posts WHERE pauthor = ? ");
+    $stmt = $conn->prepare("SELECT 
+    posts.ptext,
+    posts.pimage,
+    posts.pauthor,
+    posts.pid,
+    posts.pcreation,
+    users.uimage, 
+    users.ufname, 
+    users.ulname, 
+    users.utitle,
+    users.uid,
     
+    -- Accurate like and comment counts
+    (SELECT COUNT(*) FROM likes WHERE likes.lpost = posts.pid) AS like_count,
+    (SELECT COUNT(*) FROM comments WHERE comments.cpost = posts.pid) AS comment_count,
+    (SELECT COUNT(*) FROM saveditems WHERE saveditems.pid = posts.pid) AS saved_count,
+    -- Check if the user liked the post
+    CASE
+        WHEN EXISTS (
+            SELECT 1 
+            FROM likes 
+            WHERE likes.lpost = posts.pid AND likes.luser = ?
+        ) THEN 'liked'
+        ELSE 'like'
+    END AS is_liked,
 
-    $stmt_posts->bind_param("i", $id);
-    if (!$stmt_posts->execute()) {
-        echo json_encode(['error' => 'Database error: ' . $stmt->error]);
+    CASE
+        WHEN EXISTS (
+            SELECT 1 
+            FROM saveditems 
+            WHERE saveditems.pid = posts.pid AND saveditems.uid = ?
+        ) THEN 'saved'
+        ELSE 'save'
+    END AS is_saved
+
+FROM 
+    posts
+JOIN 
+    users ON posts.pauthor = users.uid
+WHERE 
+    users.uid = ?
+GROUP BY 
+    posts.pid, users.uid
+ORDER BY
+    posts.pcreation DESC;
+");
+
+    $stmt->bind_param("iii", $id, $id, $id);
+    if (!$stmt->execute()) {
+        echo "Error executing query: " . $stmt->error;
         exit;
     }
+    $result = $stmt->get_result();
+    $posts = $result->fetch_all(MYSQLI_ASSOC);
 
-    $result_posts = $stmt_posts->get_result();
-    $posts = $result_posts->fetch_all(MYSQLI_ASSOC); // Fetch as associative array
-    $stmt_posts->close();
+    $stmt->close();
 
     $stmt_user = $conn->prepare("SELECT users.ufname, users.ulname, users.uimage, users.ucover, users.udescription, users.utitle 
     FROM users WHERE uid = ?");
