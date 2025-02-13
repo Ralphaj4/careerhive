@@ -35,6 +35,28 @@ function getConnectionCount($id){
     }
 }
 
+<<<<<<<< Updated upstream:careerhive/functions.php
+========
+function getEmployeeCount($id){
+    require('database.php');
+    $getcount = $conn->prepare("SELECT COUNT(*) AS employee_count FROM work WHERE winstitution= ?");
+    $getcount->bind_param("i",$id);
+    if($getcount->execute()){
+        $getcount->bind_result($employee_count);
+        $getcount->fetch();
+        $getcount->close();
+        return $employee_count;
+    }
+}
+
+function InsertNotification($sender, $receiver, $type, $postid){
+    require('database.php');
+    $notif = $conn->prepare("INSERT INTO notifications (senderid, receiverid, ntype, postid) VALUES (?, ?, ?, ?)");
+    $notif->bind_param('iisi', $sender, $receiver, $type, $postid);
+    $notif->execute();
+    $notif->close();
+}
+>>>>>>>> Stashed changes:functions.php
 
 function RetrievePosts($id){
     require('database.php');
@@ -85,6 +107,20 @@ function getUserImage($id){
     $result = null;
     if ($stmt->fetch()) {
         $result = $uimage;
+    }
+    $stmt->close();
+    return $result;
+}
+
+function getInstImage($id){
+    require('database.php');
+    $stmt = $conn->prepare("SELECT iimage FROM institutions WHERE iid = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->bind_result($iimage);
+    $result = null;
+    if ($stmt->fetch()) {
+        $result = $iimage;
     }
     $stmt->close();
     return $result;

@@ -384,6 +384,7 @@ nav.navbar{
     aspect-ratio: 1 / 1;
     border-radius: 50%;
     margin-right: 10px;
+    height: auto;
 }
 
 .create-post-input textarea{
@@ -1017,4 +1018,766 @@ nav.navbar{
 .title-edit img{
     width: 12px;
     height: auto;
+<<<<<<<< Updated upstream:careerhive/style.css
+========
+}
+
+
+/* Modal styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    padding-top: 200px;
+}
+
+.modal img {
+    margin: auto;
+    display: block;
+    max-width: 80%;
+    max-height: 80%;
+}
+
+.close {
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 25px;
+}
+
+.close:hover,
+.close:focus {
+    color: #ccc;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.container-pfp {
+    position: relative;
+    display: inline-block;
+}
+
+/* Profile Image Styling */
+.profile-pic {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%; 
+     /* Optional: to make it a circle */
+}
+
+/* Camera Icon Styling */
+.camera {
+    position: absolute;
+    bottom: 10px;  /* Position it 10px from the bottom of the profile picture */
+    right: 10px;   /* Position it 10px from the right of the profile picture */
+    width: 30px;   /* Adjust the size of the camera icon */
+    height: 30px;  /* Adjust the size of the camera icon */
+    z-index: 10;     /* Ensure the camera icon is on top of the profile picture */
+    background-color: white;
+    border-radius: 50%;
+}
+
+/* Menu Styling */
+.camera-menu {
+    position: absolute;
+    top: 50%;
+    left: 100%; /* Place the menu just to the right of the camera icon */
+    transform: translateY(-50%); /* Vertically center it relative to the camera icon */
+    width: 180px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    display: none; /* Hidden by default */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    opacity: 0; /* Make it invisible */
+    pointer-events: none; /* Prevent interaction when hidden */
+    transition: left 0.3s ease, opacity 0.3s ease; /* Smooth sliding effect */
+}
+
+.camera-menu.show {
+    display: block; /* Show the menu */
+    left: calc(100% + 10px); /* Slide the menu into view, with 10px space between the icon */
+    opacity: 1; /* Make it fully visible */
+    pointer-events: auto; /* Enable interaction when visible */
+}
+
+/* Menu Item Styling */
+.menu-item {
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.menu-item:hover {
+    background-color: #f4f4f4; /* Highlight on hover */
+}
+
+#cover-image {
+    width: 100%;   /* 100% width of the container */
+    height: 350px; /* Fixed height for the cover image */
+    object-fit: cover; /* Image will fill the area and crop if needed */
+    object-position: center; /* Crop from the center */
+}
+
+.cover-home{
+    width: 100%;   /* 100% width of the container */
+    height: 200px; /* Fixed height for the cover image */
+    object-fit: cover; /* Image will fill the area and crop if needed */
+    object-position: center;
+}
+
+.profile-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    background: #f9f9f9;
+}
+.profile-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.network-container {
+    display: flex;
+    width: 100%;
+}
+
+#resultsContainer {
+    width: 65%; /* Adjust to 70% if needed */
+    padding: 10px;
+}
+
+.incomingConn {
+    width: 35; /* Adjust accordingly */
+    padding: 10px;
+    border-left: 2px solid #ccc; /* Vertical separator */
+}
+
+#posts-container h1, #resultsContainer h2{
+    margin-left: 3%;
+}
+
+.profile-experience{
+    display: flex;
+    align-items: flex-start;
+    margin: 10px 0;
+}
+
+
+.profile-experience img{
+    width: 50px;
+    margin-left: 15px;
+    margin-top: 15px;
+    margin-right: 15px;
+    margin-left: 50px;
+}
+
+.profile-experience div{
+    width: 100%;
+}
+
+.profile-experience-container h2{
+    margin-left: 10px;
+    margin-top: 20px;
+    
+}
+
+.profile-experience h3{
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-top: 20px;
+    margin-left: 50px;
+}
+
+.profile-experience b {
+    display: block;
+    font-weight: 500;
+    font-size: 15px;
+    margin-left: 50px;
+}
+
+.profile-experience p {
+    margin-top: 20px;
+    margin-left: 50px;
+}
+
+.profile-experience hr{
+    border: 0;
+    border-bottom: 1px solid #999;
+    margin-top: 10px;
+    margin-right: 100px;
+}
+
+.experience-link{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 20px;
+    font-weight: 500;
+
+}
+
+.profile-experience-container{
+    background-color: white;
+    padding: 15px;
+}
+
+.experience-link img{
+    width: 20px;
+    margin-left: 8px;
+}
+
+
+.profile-education{
+    display: flex;
+    align-items: flex-start;
+    margin: 10px 0;
+}
+
+
+.profile-education img{
+    width: 50px;
+    margin-left: 15px;
+    margin-top: 15px;
+    margin-right: 15px;
+    margin-left: 50px;
+}
+
+.profile-education div{
+    width: 100%;
+}
+
+.profile-education-container h2{
+    margin-left: 10px;
+    margin-top: 20px;
+    
+}
+
+.profile-education h3{
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-top: 20px;
+    margin-left: 50px;
+}
+
+.profile-education b {
+    display: block;
+    font-weight: 500;
+    font-size: 15px;
+    margin-left: 50px;
+}
+
+.profile-education p {
+    margin-top: 20px;
+    margin-left: 50px;
+}
+
+.profile-education hr{
+    border: 0;
+    border-bottom: 1px solid #999;
+    margin-top: 10px;
+    margin-right: 100px;
+}
+
+
+.profile-education-container{
+    background-color: white;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.profile-skills-container{
+    background-color: white;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.skill{
+    position: relative;
+    display: inline-block;
+    margin: 10px 5px;
+    padding: 6px 18px;
+    border: 1px solid #777;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.delete-skill {
+    display: none;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: red;
+    color: white;
+    border: none;
+    padding: 2px 5px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.skill:hover .delete-skill {
+    display: inline-block;
+}
+
+.profile-language-container{
+    background-color: white;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+
+.language{
+    position: relative;
+    display: inline-block;
+    margin: 10px 5px;
+    padding: 6px 18px;
+    border: 1px solid #777;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.delete-language {
+    display: none;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: red;
+    color: white;
+    border: none;
+    padding: 2px 5px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.language:hover .delete-language {
+    display: inline-block;
+}
+
+/* + Button */
+.add-education-btn {
+    background-color: #045be6;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+    float: right;
+    margin-right: 10px;
+}
+
+.add-education-btn:hover {
+    background-color: #045be6;
+}
+
+/* Popup Container */
+.education-popup-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Popup Box */
+.education-popup {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 4%;
+    text-align: center;
+    width: 320px;
+    height: 86%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Labels and Inputs */
+.education-popup label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+.education-popup input,
+.education-popup select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Year Container */
+.year-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.year-container label {
+    width: 48%;
+}
+
+/* Buttons */
+.education-popup button {
+    margin: 10px 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+#submit-education {
+    background-color: #007BFF;
+    color: white;
+}
+
+#submit-education:hover {
+    background-color: #0056b3;
+}
+
+#close-popup {
+    background-color: #ccc;
+}
+
+#close-popup:hover {
+    background-color: #999;
+}
+
+
+
+/* + Button */
+.add-experience-btn {
+    background-color: #045be6;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+    float: right;
+    margin-right: 10px;
+}
+
+.add-experience-btn:hover {
+    background-color: #045be6;
+}
+
+/* Popup Container */
+.experience-popup-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Popup Box */
+.experience-popup {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 4%;
+    text-align: center;
+    width: 320px;
+    height: 86%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Labels and Inputs */
+.experience-popup label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+.experience-popup input,
+.experience-popup select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Year Container */
+.year-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.year-container label {
+    width: 48%;
+}
+
+/* Buttons */
+.experience-popup button {
+    margin: 10px 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+#submit-experience {
+    background-color: #007BFF;
+    color: white;
+}
+
+#submit-experience:hover {
+    background-color: #0056b3;
+}
+
+#close-popupExp {
+    background-color: #ccc;
+}
+
+#close-popupExp:hover {
+    background-color: #999;
+}
+
+input[list] {
+    pointer-events: auto; /* Ensure interaction is enabled */
+}
+
+
+
+/* + Button */
+.add-language-btn {
+    background-color: #045be6;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+    float: right;
+    margin-right: 10px;
+}
+
+.add-language-btn:hover {
+    background-color: #045be6;
+}
+
+/* Popup Container */
+.language-popup-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Popup Box */
+.language-popup {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 4%;
+    text-align: center;
+    width: 320px;
+    height: 86%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Labels and Inputs */
+.language-popup label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+.language-popup input,
+.language-popup select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Year Container */
+.year-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.year-container label {
+    width: 48%;
+}
+
+/* Buttons */
+.language-popup button {
+    margin: 10px 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+#submit-language {
+    background-color: #007BFF;
+    color: white;
+}
+
+#submit-language:hover {
+    background-color: #0056b3;
+}
+
+#close-popupLang {
+    background-color: #ccc;
+}
+
+#close-popupLang:hover {
+    background-color: #999;
+}
+
+
+/* + Button */
+.add-skill-btn {
+    background-color: #045be6;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+    float: right;
+    margin-right: 10px;
+}
+
+.add-skill-btn:hover {
+    background-color: #045be6;
+}
+
+/* Popup Container */
+.skill-popup-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Popup Box */
+.skill-popup {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 4%;
+    text-align: center;
+    width: 320px;
+    height: 86%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Labels and Inputs */
+.skill-popup label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+.skill-popup input,
+.skill-popup select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Year Container */
+.year-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.year-container label {
+    width: 48%;
+}
+
+/* Buttons */
+.skill-popup button {
+    margin: 10px 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+#submit-skill {
+    background-color: #007BFF;
+    color: white;
+}
+
+#submit-skill:hover {
+    background-color: #0056b3;
+}
+
+#close-popupSkill {
+    background-color: #ccc;
+}
+
+#close-popupSkill:hover {
+    background-color: #999;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.delete-post {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.delete-post img {
+    width: 20px;
+    height: 20px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.delete-post:hover img {
+    opacity: 1;
+>>>>>>>> Stashed changes:style.css
 }
