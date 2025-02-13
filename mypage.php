@@ -28,7 +28,7 @@ $employees = getEmployeeCount($userId);
 <div class="container">
     <div class="profile-main">
         <div class="profile-container">
-            <img id="cover-image" class="cover-image" src="default-cover.jpg" alt="Cover Image">
+            <img id="cover-image" class="cover-image" alt="Cover Image">
             <div class="profile-container-inner">
                 <!-- Display the user's profile image dynamically -->
                 <div class="container-pfp">
@@ -43,7 +43,7 @@ $employees = getEmployeeCount($userId);
                 </div>
                     <input type="file" id="cover-image-input" accept="image/*" style="display: none;">
                     <input type="file" id="profile-image-input" accept="image/*" style="display: none;">
-                <h1 id="name2"></h1>
+                <h1 class="profile-name"></h1>
                 <div id="imageModal" class="modal" style="display: none;">
                     <span id="closeModal" class="close">&times;</span>
                     <img id="fullImage" alt="Full Profile Image" style="width: 100%; height: auto;">
@@ -60,49 +60,29 @@ $employees = getEmployeeCount($userId);
             </div>
         </div>
     </div>
-
-    <div class="profile-description ">
-        <br>
-        <h2>About</h2>
-        <div class="textarea-container">
-            <?php 
-                // Fetch user's saved description from the database
-                $savedDescription = isset($_SESSION['udescription']) ? $_SESSION['udescription'] : "";
-                $maxLength = 600;
-                $remaining = $maxLength - strlen($savedDescription);
-            ?>
-            
-            <textarea id="description" name="description" rows="5" maxlength="250"
-                placeholder="Write about yourself..."><?php echo htmlspecialchars($savedDescription); ?></textarea>
-            
-            <div class="char-count-btn-container">
-                <p id="charCount"><?php echo $remaining; ?> characters remaining</p>
-                <button type="button" id="submit-btn" class="save-btn" onclick="uploadDescription(<?php echo $userId; ?>)">Save</button>
-            </div>
-        </div>
-    </div>
     
     <h2 style="margin-bottom: 25px;">Posts</h2>
     <form id="textForm" method="post" enctype="multipart/form-data">
     <div class="create-post">
         <div class="create-post-input">
-            <img id="profile-image-post" alt="Profile Image" class="profile-pic" style="margin: 0 ; margin-right :15px;" >
-            <textarea id="userInput" name="userInput" rows="3" placeholder="What's on your mind"></textarea>
+            <img id="profile-image-post" alt="Profile Image" class="profile-pic" style="margin: 0 ; margin-right :15px;">
+            <div style="flex-grow: 1;">
+                <textarea id="jobtitle" name="userInput" rows="1" placeholder="Job Title"></textarea>
+                <hr style="margin: 10px 0; border: 0.5px solid #ccc;">
+                <textarea id="jobdesc" name="additionalInput" rows="2" placeholder="Description"></textarea>
+            </div>
             <div id="mediaPreview"></div>
         </div>
-        <div class="create-post-links">
-            <li id="photoButton"><img src="images/photo.png"> Photo</li>
-            <li><img src="images/video.png"> Video</li>
-            <li><img src="images/event.png"> Event</li>
-            <button type="submit" id="submitBtn"><li>Post</li></button>
-        </div>
-        <!-- Hidden File Input -->
-        <input type="file" id="photoInput" name="photoInput" accept="image/*" style="display: none;">
+        <button type="submit" id="submitBtn" style="width: 100%; padding: 10px; margin-top: 10px; border: none; background-color: #007bff; color: white; font-size: 16px; cursor: pointer; border-radius: 5px;">
+            Post
+        </button>
     </div>
 </form>
 
+
+
     <div class="profile-post-container">
-        </div>
+    </div>
 </div>
 
 <div class="profile-sidebar">

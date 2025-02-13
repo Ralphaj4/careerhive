@@ -527,6 +527,13 @@ document.addEventListener('DOMContentLoaded', function () {
     .catch(error => console.error('Error fetching news:', error));
   }
 
+  if(pageType === "jobs"){
+    fetch('a_fetchJobs.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+  }
+
   if (pageType === "navbarInst") {
     let iid = getCookie("id");
 
@@ -544,6 +551,23 @@ document.addEventListener('DOMContentLoaded', function () {
   if (pageType === "mypage") {
     let iid = getCookie("id");
 
+    document.getElementById('submitBtn').addEventListener("click", function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const jobTitle = document.getElementById("jobtitle").value;
+        const jobDescription = document.getElementById("jobdesc").value;
+        fetch('a_uploadJob.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: jobTitle, desc: jobDescription })
+        }).then((response) => response.text())
+        .then((data) => {
+            setTimeout(() => {
+                window.location.reload(); // Reload the page
+            }, 100);
+        });
+    });
+
     fetch('a_fetchMyPage.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -556,15 +580,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const mycover = document.getElementById('cover-image');
         const mytitle = document.getElementById('currentTitle');
         const mydesc = document.getElementById('description');
-        const myname = document.getElementById('name2');
+        const myname = document.querySelector('.profile-name');
+        myname.textContent = data.institution[0].iname;
 
         // Set profile details
         myimage.src = data.institution[0].iimage;
         myimagepost.src = data.institution[0].iimage;
         mycover.src = data.institution[0].icover;
-        mytitle.innerHTML = data.institution[0].itype;
+        mytitle.innerHTML = String(data.institution[0].itype).charAt(0).toUpperCase() + String(data.institution[0].itype).slice(1);
         mydesc.innerHTML = data.institution[0].udescription;
-        myname.innerHTML = data.institution[0].iname;
+        //myname.innerHTML = data.institution[0].iname;
 
        
         // ADD MY POSTS
@@ -1538,7 +1563,7 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .then((response) => response.text())
       .then((data) => {
-          console.log("Upload successful:", data);
+          //console.log("Upload successful:", data);
           setTimeout(() => {
               window.location.reload(); // Reload the page
           }, 100);

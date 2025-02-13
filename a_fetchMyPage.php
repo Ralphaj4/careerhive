@@ -5,62 +5,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $input = json_decode(file_get_contents('php://input'), true);
     $id = $input['id'] ?? null;
     $stmt = $conn->prepare("SELECT 
-    posts.ptext,
-    posts.pimage,
-    posts.pauthor,
-    posts.pid,
-    posts.pcreation,
-    institutions.iimage, 
-    institutions.iname,
-    institutions.itype,
-    institutions.iid,
-    
-    -- Accurate like and comment counts
-    (SELECT COUNT(*) FROM likes WHERE likes.lpost = posts.pid) AS like_count,
-    (SELECT COUNT(*) FROM comments WHERE comments.cpost = posts.pid) AS comment_count,
-    (SELECT COUNT(*) FROM saveditems WHERE saveditems.pid = posts.pid) AS saved_count,
-    -- Check if the user liked the post
-    CASE
-        WHEN EXISTS (
-            SELECT 1 
-            FROM likes 
-            WHERE likes.lpost = posts.pid AND likes.luser = ?
-        ) THEN 'liked'
-        ELSE 'like'
-    END AS is_liked,
-
-    CASE
-        WHEN EXISTS (
-            SELECT 1 
-            FROM saveditems 
-            WHERE saveditems.pid = posts.pid AND saveditems.uid = ?
-        ) THEN 'saved'
-        ELSE 'save'
-    END AS is_saved
-
+    jobs.jid,
+    jobs.jtitle,
+    jobs.jdescription,
+    jobs.jcreation
 FROM 
-    posts
-JOIN 
-    institutions ON posts.pauthor = institutions.iid
+    jobs
 WHERE 
-    institutions.iid = ?
-GROUP BY 
-    posts.pid, institutions.iid
+    jobs.iid = ?
 ORDER BY
-    posts.pcreation DESC;
+    jobs.jcreation DESC;
 ");
 
-    $stmt->bind_param("iii", $id, $id, $id);
+    $stmt->bind_param("i", $id);
     if (!$stmt->execute()) {
         echo "Error executing query: " . $stmt->error;
         exit;
     }
     $result = $stmt->get_result();
-    $posts = $result->fetch_all(MYSQLI_ASSOC);
+    $jobs = $result->fetch_all(MYSQLI_ASSOC);
 
     $stmt->close();
 
-    $stmt_institutions = $conn->prepare("SELECT institutions.iname,institutions.iimage, institutions.icover,institutions.itype, institutions.iid                                                     
+    $stmt_institutions = $conn->prepare("SELECT institutions.iname, institutions.iimage, institutions.icover,institutions.itype, institutions.iid                                                     
     FROM institutions WHERE iid = ?");
     $stmt_institutions->bind_param("i", $id);
     if (!$stmt_institutions->execute()) {
@@ -68,12 +35,12 @@ ORDER BY
         exit;
     }
     $result_institutions = $stmt_institutions->get_result();
-    $institutions = $result_institutions->fetch_all(MYSQLI_ASSOC); // Fetch as associative array
+    $institutions = $result_institutions->fetch_all(MYSQLI_ASSOC);
     $stmt_institutions->close();
 
 
     $response = [
-        'posts' => $posts,
+        'jobs' => $jobs,
         'institution' => $institutions,
         
     ];
