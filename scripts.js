@@ -527,6 +527,265 @@ document.addEventListener('DOMContentLoaded', function () {
     .catch(error => console.error('Error fetching news:', error));
   }
 
+  if (pageType === "navbarInst") {
+    let iid = getCookie("id");
+
+    fetch('a_fetchMyPage.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: iid })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const myname = document.getElementById('name');
+        myname.innerHTML = data.institution[0].iname;
+})}
+
+  if (pageType === "mypage") {
+    let iid = getCookie("id");
+
+    fetch('a_fetchMyPage.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: iid })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const myimage = document.getElementById('profile-image');
+        const myimagepost = document.getElementById('profile-image-post');
+        const mycover = document.getElementById('cover-image');
+        const mytitle = document.getElementById('currentTitle');
+        const mydesc = document.getElementById('description');
+        const myname = document.getElementById('name2');
+
+        // Set profile details
+        myimage.src = data.institution[0].iimage;
+        myimagepost.src = data.institution[0].iimage;
+        mycover.src = data.institution[0].icover;
+        mytitle.innerHTML = data.institution[0].itype;
+        mydesc.innerHTML = data.institution[0].udescription;
+        myname.innerHTML = data.institution[0].iname;
+
+       
+        // ADD MY POSTS
+        const postsContainer = document.querySelector(".profile-post-container");
+        postsContainer.innerHTML = `<h2 style="margin-top: 20px;">Posts</h2>`;
+
+
+        if (data.posts.length > 0) {
+            let count = 1;
+        
+            data.posts.forEach((post) => {
+                const postElement = document.createElement("div");
+                postElement.classList.add("post");
+                postElement.innerHTML = `
+                <div class="post-header">
+                    <div class="post-author">
+                        <a href="profile.php?id=${encodeURIComponent(btoa(post.iid))}">
+                            <img src="${post.uimage}" alt="">
+                        </a>
+                        <div>
+                            <a href="profile.php?id=${encodeURIComponent(btoa(post.iid))}" style="text-decoration: none; color: inherit;">
+                                <h1>${post.iname}</h1>
+                            </a>
+                            <small>${post.itype}</small>
+                            <small>${formatTimeAgo(post.pcreation)}</small>
+                        </div>
+                    </div>
+                    <button class="delete-post" data-postid="${post.pid}">
+                        <img src="images/delete.png" alt="Delete">
+                    </button>
+                </div>
+                    <p>${post.ptext}</p>
+                    ${post.pimage ? `<img src="${post.pimage}" alt="" width="100%" />` : ""}
+                    
+                    <div class="post-stats">
+                        <div>
+                            <img src="images/thumbsup.png">
+                            <img src="images/love.png">
+                            <img src="images/clap.png">
+                            <span class="liked-users">${post.like_count} likes</span>
+                        </div>
+                        <div>
+                            <span>${post.comment_count} comments &middot; ${post.saved_count} saves</span>
+                        </div>
+                    </div>
+                    
+                    <div class="post-activity">
+                        <div>
+                            <img src="${post.iimage}" alt="" class="post-activity-user-icon">
+                            <img src="images/down-arrow.png" class="post-activity-arrow-icon">
+                        </div>
+                        <div class="post-activity-link">
+                            <button id="like" class="like" onClick="toggleImage(0, ${post.pid})" data-postid="${post.pid}">
+                                <img src="images/${post.is_liked}.png" id="toggleImage${post.pid}">
+                                <span>Like</span>
+                            </button>
+                        </div>
+                        <div class="post-activity-link">
+                            <button id="showCommentBox${count}" class="comment-post" onClick="showComments(${count},${post.pid})" data-postid="${post.pid}">
+                                <img src="images/comment.png">
+                                <span>Comment</span>
+                            </button>
+                        </div>
+                        <div class="post-activity-link">
+                            <button onClick=toggleImage(1,${post.pid})><img src="images/${post.is_saved}.png" id="togglesave${post.pid}"><span>Save</span></button>
+                        </div>
+                        
+                        <div id="overlay${count}" class="overlay" style="display: none;"></div>
+                        <div id="whiteBox${count}" class="white-box" style="display: none;">
+                            <div>
+                                <button id="close-Comments" class="close-Comments" onClick="toggleVisibility(false, ${count}, 0)"><p>X</p></button>
+                            </div>
+                            <div class="comments-container" id="comments-container${count}">
+                                <p>Comments will appear here...</p>
+                            </div>
+                            <div>
+                                <textarea id="userComment${count}" class="userComment" name="userComment" rows="1" placeholder="Type a comment"></textarea>
+                                <button id="sendComment${post.pid}" class="sendComment" onClick="postComment(${count},${post.pid})"><img src="images/send.png"></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        
+                postsContainer.appendChild(postElement);
+                count++;
+            });
+
+            // Add event listener for deleting posts
+            document.querySelectorAll(".delete-post").forEach((btn) => {
+                btn.addEventListener("click", function () {
+                    const postId = this.getAttribute("data-postid");
+                    console.log(postId);
+                    fetch('a_deletePost.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({postId: postId})     
+                    })
+                });
+            });
+        } else {
+            postsContainer.innerHTML = '<div style="display:flex; align-items:center;justify-content: center;height: 70vh;"><h2>No Posts Found</h2></div>';
+        }
+        
+
+    })
+    .catch(error => console.error('Error fetching profile:', error));
+
+    // document.body.addEventListener("click", (event) => {
+    //     if (event.target.id === "submit-language") {
+    //         const language = document.getElementById('language-name');
+    //         if (language.value) {
+    //             let lang = language.value;
+
+    //             fetch('a_uploadLanguage.php', {
+    //                 method: 'POST',
+    //                 headers: { 'Content-Type': 'application/json' },
+    //                 body: JSON.stringify({language: lang})
+    //             });
+    //             const newLanguage = {
+    //                 lname: lang
+    //             };
+    //             const langContainer = document.querySelector(".profile-language-container");
+    //             const popupContainerLang = document.querySelector(".language-popup-container");
+    //             const langp = document.createElement("p");
+    //             langp.classList.add("language");
+    //             langp.textContent = newLanguage.lname;
+    //             langContainer.appendChild(langp);
+    //             popupContainerLang.style.display = "none";
+    //         }
+    //     }
+    // });
+
+    // document.body.addEventListener("click", (event) => {
+    //     if (event.target.id === "submit-skill") {
+    //         const skill = document.getElementById('skill-name');
+    //         if (skill.value) {
+    //             let sk = skill.value;
+    //             fetch('a_uploadSkill.php', {
+    //                 method: 'POST',
+    //                 headers: { 'Content-Type': 'application/json' },
+    //                 body: JSON.stringify({ type: 1, skill: sk})
+    //             });
+
+    //             const newEducation = {
+    //                 skillname: sk
+    //             };
+    //             const skillsContainer = document.querySelector(".profile-skills-container");
+    //             const popupContainerSkill = document.querySelector(".skill-popup-container");
+    //             const skillp = document.createElement("p");
+    //             skillp.classList.add("skill");
+    //             skillp.textContent = newEducation.skillname;
+    //             skillsContainer.appendChild(skillp);
+    //             popupContainerSkill.style.display = "none";
+    //     }
+    //     }
+
+    //     // Handle skill deletion
+    //     if (event.target.classList.contains("delete-skill")) {
+    //         const skillElement = event.target.closest(".skill");
+    //         const skillName = skillElement.dataset.skillname;
+    //         //console.log(skillName);
+    //         fetch("a_uploadSkill.php", {
+    //             method: "POST",
+    //             headers: { "Content-Type": "application/json" },
+    //             body: JSON.stringify({ type: 0, skill: skillName })
+    //         });
+
+    //         skillElement.remove();
+    //     }
+
+    //     // Handle language deletion
+    //     if (event.target.classList.contains("delete-language")) {
+    //         const langElement = event.target.closest(".language");
+    //         const lname = langElement.dataset.lname;
+    //         //console.log(skillName);
+    //         fetch("a_uploadLanguage.php", {
+    //             method: "POST",
+    //             headers: { "Content-Type": "application/json" },
+    //             body: JSON.stringify({ type: 0, language: lname })
+    //         });
+
+    //         langElement.remove();
+    //     }
+    // });
+    
+    
+    fetch('a_fetchNews.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    }).then(response => response.json())
+      .then(data => {
+          const newsContainer = document.getElementById('sidebar-news');
+          newsContainer.innerHTML = '';
+    
+          const title = document.createElement('h3');
+          title.textContent = "Trending News";
+          newsContainer.appendChild(title);
+          if (data.articles && data.articles.length > 0) {
+              for (let i = 0; i < 4; i++) { 
+                  const article = data.articles[i];
+                  console.log(data.articles[i]);
+    
+                  const newsItem = document.createElement("a");
+                  newsItem.href = article.link;
+                  newsItem.innerHTML = `<p>${article.title}</p>`;
+    
+                  const newsMeta = document.createElement("small");
+                  newsMeta.innerHTML = `${article.pubDate} <span>${article.source_id}</span>`;
+    
+                  newsContainer.appendChild(newsItem);
+                  newsContainer.appendChild(newsMeta);
+              }
+    
+          } else {
+              newsContainer.innerHTML = `<div style="display:flex; align-items:center;justify-content: center;height: 70vh;">
+                  <h2>No News Found</h2>
+              </div>`;
+          }
+      })
+      .catch(error => console.error('Error fetching news:', error));
+  }
 
   if (pageType === "myprofile") {
     let uid = getCookie("id");

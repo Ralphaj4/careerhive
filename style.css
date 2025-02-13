@@ -391,6 +391,7 @@ nav.navbar{
     aspect-ratio: 1 / 1;
     border-radius: 50%;
     margin-right: 10px;
+    height: auto;
 }
 
 .create-post-input textarea{
@@ -1093,7 +1094,8 @@ nav.navbar{
 .profile-pic {
     width: 150px;
     height: 150px;
-    border-radius: 50%;  /* Optional: to make it a circle */
+    border-radius: 50%; 
+     /* Optional: to make it a circle */
 }
 
 /* Camera Icon Styling */
