@@ -1,12 +1,18 @@
 <?php
+session_start(); // Start the session to access session variables
+
 if (!isset($_COOKIE['id'])) {
     header("Location: index.php");
     exit;
 }
-require_once('functions.php');
-$user_image = getUserImage(base64_decode($_COOKIE['id']));
 
-// Get the current page filename
+require_once('functions.php');
+
+// Check if session variables exist before using them
+$user_image = isset($_SESSION['uimage']) ? $_SESSION['uimage'] : 'images/default-profile.png';
+$fname = isset($_SESSION['fname']) ? $_SESSION['fname'] : 'User';
+$lname = isset($_SESSION['lname']) ? $_SESSION['lname'] : '';
+
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
@@ -37,16 +43,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <img src="images/network.png"><span>My Network</span></a></li>
             <li><a href="jobs.php" class="<?= $current_page == 'jobs.php' ? 'active-link' : '' ?>">
                 <img src="images/jobs.png"><span>Jobs</span></a></li>
-            <!-- <li><a href="messaging.php" class="<?= $current_page == 'messaging.php' ? 'active-link' : '' ?>">
-                <img src="images/message.png"><span>Messaging</span></a></li>
-            <li><a href="notifications.php" class="<?= $current_page == 'notifications.php' ? 'active-link' : '' ?>">
-                <img src="images/notification.png"><span>Notifications</span></a></li> -->
         </ul>
     </div>
 
     <div class="navbar-right">
         <div class="online">
-            <?php echo '<img class="nav-profile-img" onclick="toggleDropMenu()" src="' . $_SESSION['uimage'] . '" alt="" />'; ?>
+            <img class="nav-profile-img" onclick="toggleDropMenu()" src="<?= $user_image ?>" alt="Profile Image" />
         </div>
     </div>
 
@@ -54,9 +56,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <div class="profile-menu-wrap" id="profileMenu">
         <div class="profile-menu">
             <div class="user-info">
-                <?php echo '<img src="' . $_SESSION['uimage'] . '" alt="" />'; ?>
+                <img src="<?= $user_image ?>" alt="Profile Image" />
                 <div>
-                    <?php echo '<h4>' . $_SESSION["fname"] . " " . $_SESSION["lname"] . '</h4>' ?>
+                    <h4><?= htmlspecialchars($fname . " " . $lname) ?></h4>
                     <a href="myprofile.php">See your profile</a>
                 </div>
             </div>
@@ -71,7 +73,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <p>Settings & Privacy</p>
                 <span>></span>
             </a>
-            <a href="mailto: ralphaj4@gmail.com" class="profile-menu-link">
+            <a href="mailto:ralphaj4@gmail.com" class="profile-menu-link">
                 <img src="images/help.png">
                 <p>Help & Support</p>
                 <span>></span>
@@ -85,42 +87,40 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </div>
 
 </nav>
+
 <script>
     let profileMenu = document.getElementById("profileMenu");
-function toggleDropMenu(){
+
+    function toggleDropMenu() {
         profileMenu.classList.toggle("open-menu");
     }
-    function retrieveProfiles(){
-  const searchbox = document.getElementById('search');
-  searchInput = document.getElementById('searchInput')
-  const userInput = searchInput.value;
-  const parts = userInput.split(/\s+/); // Splits by one or more spaces
-  let requestData = { fname: "", lname: "" };
 
-  if (parts.length >= 2) {
-    requestData.fname = parts[0]; // First name
-    requestData.lname = parts.slice(1).join(" "); // Remaining words as last name
-  } else {
-    requestData.fname = userInput; // If only one word, it's the first name
-  }
+    function retrieveProfiles() {
+        const searchInput = document.getElementById('searchInput');
+        const userInput = searchInput.value.trim();
+        const parts = userInput.split(/\s+/); // Splits by one or more spaces
+        let requestData = { fname: "", lname: "" };
 
-  fetch('a_retrieveProfiles.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(requestData)
-  })
-  .then(response => response.json())
-  .then(data => {
-    sessionStorage.removeItem("searchResults");
-    sessionStorage.setItem("searchResults", JSON.stringify(data));
-    //code before the pause
-    
-    window.location.href = `search.php`;
-    
-})
-  .catch(console.error);
-}
+        if (parts.length >= 2) {
+            requestData.fname = parts[0]; // First name
+            requestData.lname = parts.slice(1).join(" "); // Remaining words as last name
+        } else {
+            requestData.fname = userInput; // If only one word, it's the first name
+        }
 
+        fetch('a_retrieveProfiles.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            sessionStorage.setItem("searchResults", JSON.stringify(data));
+            window.location.href = `search.php`;
+        })
+        .catch(console.error);
+    }
 </script>
+
 </body>
 </html>

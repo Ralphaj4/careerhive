@@ -5,6 +5,8 @@
     box-sizing: border-box;
 }
 
+
+
 div{
     border-radius: 10px;
 }
@@ -1805,4 +1807,240 @@ input[list] {
 
 .delete-post:hover img {
     opacity: 1;
+}
+
+
+/* .jobs-container {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.jobs-container {
+    display: flex;
+    width: 100%;
+    position: relative;
+}
+
+.jobs-wrapper {
+    flex-basis: 75%;
+} */
+
+.job {
+    width: 98%; /* Make sure each job takes full width */
+    background: #fff;
+    padding: 20px 25px 5px;
+    margin: 15px 0 20px;
+    margin-left: 15px;
+    box-sizing: border-box; /* Ensures padding doesn’t affect width */
+}
+
+.job-author {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.job-author img {
+    width: 35px;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    margin-right: 10px;
+    margin-top: 5px;
+}
+
+.job-author h1 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    margin-left: 10px;
+}
+
+.job-author small {
+    display: block;
+    margin-bottom: -2px;
+    margin-left: 10px;
+}
+
+.job p {
+    margin-bottom: 10px;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.vertical-line {
+    position: absolute;
+    left: 75%; /* Position at the end of the job section */
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: #ccc; /* Light gray line */
+    margin-left: 30px;
+    margin-top: 15px;
+}
+
+
+.jobs-container {
+    display: flex;
+    width: 100%;
+    position: relative;
+    overflow-y: hidden;
+}
+
+.jobs-wrapper {
+    flex-basis: 75%;  /* Takes up 75% of the container */
+    display: flex;
+    flex-direction: column; /* Stack jobs vertically */
+}
+
+.pages-wrapper {
+    flex-basis: 25%;  /* Takes up 25% of the container */
+    padding: 20px;
+    background: #f4f4f4;  /* Light gray background for pages section */
+    overflow-y: auto;
+    border-left: 2px solid #ddd; /* Add a subtle line between jobs and pages */
+    position: relative;
+}
+
+.page {
+    background: #fff;
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+}
+
+.page-author {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.page-author img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    margin-right: 10px;
+}                                                       
+
+.page-author h1 {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+.page-author small {
+    display: block;
+    font-size: 12px;
+    color: #777;
+}
+
+.page p {
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+#pages-container {
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+#pages-container .job {
+    max-width: 100%;
+    box-sizing: border-box; /* Ensures padding and borders are included in the width */
+}
+
+.jobs-container, .pages-container {
+    display: flex;
+    flex-wrap: nowrap;
+    height: 100vh; /* Ensure these containers do not exceed viewport height */
+}
+
+.jobs-wrapper, .pages-wrapper {
+    height: 100%;
+    overflow-y: auto; /* Vertical scroll if needed */
+}
+
+.pages-container {
+    width: 25%; /* Ensure this takes 25% of the screen width */
+    overflow-y: auto; /* Vertical scrolling if content overflows */
+}
+
+.apply-btn {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.apply-btn:hover {
+    background-color:#0056b3 ;
+}
+
+.apply-form-container {
+    margin-top: 15px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    display: none; /* Hidden by default */
+}
+
+.apply-form-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.apply-form-container input[type="file"] {
+    border: 2px solid #ddd;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #fff;
+    transition: background-color 0.6s ease, border-color 0.6s ease;
+}
+
+.apply-form-container h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+    font-weight: 600;
+    text-align: center; /* Center the title */
+}
+
+.apply-form-container input[type="file"]:hover {
+    background-color: #f1f1f1;
+    border-color: #0056b3;
+}
+
+.apply-form-container button[type="submit"] {
+    background-color: #007BFF;
+    color: white;
+    padding: 12px 25px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%; /* Full width to match the form width */
+    margin-top: 10px;
+}
+
+.apply-form-container button[type="submit"]:hover {
+    background-color: #0056b3;
+    transform: scale(1.005); /* Slightly enlarge on hover */
+}
+
+.btn-container {
+    display: flex;
+    gap: 10px; /* Adds space between buttons */
 }

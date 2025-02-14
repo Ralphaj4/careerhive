@@ -19,7 +19,6 @@ if(!isset($_COOKIE['id'])){
    
 <?php 
 require('functions.php');
-session_start();
 storeInSession(base64_decode($_COOKIE["id"]));
 require('navbar.php');
 require('database.php');

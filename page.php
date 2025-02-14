@@ -5,8 +5,7 @@ if(!isset($_COOKIE['id'])){
 }
 if (isset($_GET['id'])) {
     require('functions.php');
-    session_start();
-    $user = getInstData($_GET['id']);
+    $user = getInstData(base64_decode($_GET['id']));
     $connections = getEmployeeCount(base64_decode($_GET["id"]));
 }
 ?>

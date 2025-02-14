@@ -193,6 +193,125 @@ document.addEventListener('DOMContentLoaded', function () {
   .catch(error => console.error('Error fetching news:', error));
   }
 
+  if (pageType === 'jobs') {
+    fetch('a_fetchJobs.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data); // Debugging: Check if jobs are received
+        const jobsContainer = document.getElementById('jobs-container');
+        jobsContainer.innerHTML = '';
+        const pagesContainer = document.getElementById('pages-container');
+        pagesContainer.innerHTML = '';
+
+        if (data.jobs && data.jobs.length > 0) {
+            data.jobs.forEach((job) => {
+                const jobElement = document.createElement("div");
+                jobElement.classList.add("job");
+                jobElement.innerHTML = `
+                    <div class="job-author">
+                        <a href="profile.php?id=${encodeURIComponent(btoa(job.jid))}">
+                            <img src="${job.iimage}" alt="">
+                        </a>
+                        <div>
+                            <a href="profile.php?id=${encodeURIComponent(btoa(job.jid))}" style="text-decoration: none; color: inherit;">
+                                <h1>${job.iname}</h1>
+                            </a>
+                            <small>${job.jtitle}</small>
+                            <small>${formatTimeAgo(job.jcreation)}</small>
+                        </div>
+                    </div>
+                    <p>${job.jdescription}</p>
+                    <!-- Apply Button -->
+                    <div class="btn-container">
+                    <button class="apply-btn" onclick="openApplyForm(${job.jid})">Apply</button>
+                    <button class="apply-btn" id="close-btn"onclick="closeApplyForm(${job.jid})" style="display:none;">Close</button>
+                    </div>
+                    <!-- Hidden Form for File Upload -->
+                    <div class="apply-form-container" id="apply-form-${job.jid}" style="display:none;">
+                        <form id="apply-form-${job.jid}-form" enctype="multipart/form-data">
+                            <label for="resume">Upload your resume (PDF):</label>
+                            <input type="file" name="document" accept=".pdf" required />
+                            <input type="hidden" name="job_id" value="${job.jid}" id="job-id-${job.jid}">
+                            <button type="submit">Submit Application</button>
+                        </form>
+                    </div>
+                `;
+                jobsContainer.appendChild(jobElement);
+                const applyForms = document.querySelectorAll('.apply-form-container form');
+                applyForms.forEach(form => {
+                    form.addEventListener('submit', function(event) {
+                        event.preventDefault(); // Prevent the default form submission
+
+                        const formData = new FormData(form); // Create a FormData object from the form
+                        const jobId = formData.get('jid');
+                        
+                        fetch('a_applyJob.php', {
+                            method: 'POST',
+                            body: formData,
+                        })
+                        .then(response => {
+                            console.log('Raw response:', response); // Log the raw response
+                            return response.json(); // Try to parse it as JSON
+                        })
+                        .then(data => {
+                            console.log(data); // Check the parsed data
+                            if (data.success) {
+                                alert("Application submitted successfully!");
+                                // Optionally, hide the form or update the UI
+                                document.getElementById(`apply-form-${jobId}`).style.display = 'none';
+                            } else {
+                                alert("There was an error submitting your application.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("There was an error with the submission.");
+                        });
+                        
+                    });
+                });
+
+            });
+        } else {
+            jobsContainer.innerHTML = '<div style="display:flex; align-items:center;justify-content: center;height: 70vh;"><h2>No Jobs Found</h2></div>';
+        }
+
+        if (data.pages && data.pages.length > 0) {
+            const pagesHeader = document.createElement('h2');
+            pagesHeader.textContent = 'Related Pages';
+            pagesHeader.style.marginLeft = '10px';
+            pagesContainer.appendChild(pagesHeader);
+
+            data.pages.forEach((page) => {
+                const pageElement = document.createElement("div");
+                pageElement.classList.add("job"); // Changed from "post" to "job"
+                pageElement.innerHTML = `
+                    <div class="job-author">  <!-- Changed from "post-author" to "job-author" -->
+                        <a href="profile.php?id=${encodeURIComponent(btoa(page.jid))}">
+                            <img src="${page.iimage}" alt="">
+                        </a>
+                        <div>
+                            <a href="profile.php?id=${encodeURIComponent(btoa(page.jid))}" style="text-decoration: none; color: inherit;">
+                                <h1>${page.iname}</h1>
+                            </a>
+                            <small>${page.itype}</small>
+                            <small>${page.iemail}</small>
+                        </div>
+                    </div>
+                `;
+                pagesContainer.appendChild(pageElement);
+            });
+        } else {
+            pagesContainer.innerHTML = '<div style="display:flex; align-items:center;justify-content: center;height: 70vh;"><h2>No Pages Found</h2></div>';
+        }
+    })
+    .catch(error => console.error('Error fetching jobs:', error));
+}
+
+
   if (pageType === "profile") {
     const urlParams = new URLSearchParams(window.location.search);
     const profileUserId = atob(urlParams.get("id")); // Profile user ID from the URL
@@ -527,12 +646,12 @@ document.addEventListener('DOMContentLoaded', function () {
     .catch(error => console.error('Error fetching news:', error));
   }
 
-  if(pageType === "jobs"){
-    fetch('a_fetchJobs.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    })
-  }
+//   if(pageType === "jobs"){
+//     fetch('a_fetchJobs.php', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' }
+//     })
+//   }
 
   if (pageType === "navbarInst") {
     let iid = getCookie("id");
@@ -2013,3 +2132,78 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+// function handleApplyFormSubmit(event, jobId) {
+//     event.preventDefault(); // Prevent default form submission behavior
+
+//     const form = document.getElementById(`apply-form-${jobId}-form`);
+//     const formData = new FormData(form);
+
+//     fetch('a_applyJob.php', {
+//         method: 'POST',
+//         body: formData
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             alert(data.success); // Show success message
+//         } else {
+//             alert(data.error); // Show error message
+//         }
+//     })
+//     .catch(error => console.error('Error during application submission:', error));
+// }
+
+document.querySelector("#apply-form-" + jobId + "-form").addEventListener("submit", function(e) {
+    e.preventDefault(); // Prevent default form submission
+
+    // Disable the button to prevent double submission
+    var submitButton = document.querySelector("#apply-form-" + jobId + "-form button");
+    submitButton.disabled = true;
+
+    // Prepare the form data
+    var formData = new FormData(this);
+
+    // Send the AJAX request
+    fetch('a_applyJob.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Handle success (show success message)
+            alert("Application submitted successfully!");
+        } else {
+            // Handle error (show error message)
+            alert("There was an error with the submission: " + data.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("There was an error with the submission");
+    })
+    .finally(() => {
+        // Re-enable the button after the request completes
+        submitButton.disabled = false;
+    });
+});
+
+
+// Add this listener to your form
+const form = document.getElementById(`apply-form-${jobId}-form`);
+form.addEventListener('submit', (event) => handleApplyFormSubmit(event, jobId));
+
+function openApplyForm(jobId) {
+    const formContainer = document.getElementById(`apply-form-${jobId}`);
+    formContainer.style.display = 'block'; // Show the apply form
+    const closebtn = document.getElementById(`close-btn`);
+    closebtn.style.display = 'block'; // Show the apply form
+}
+
+
+function closeApplyForm(jobId) {
+    const formContainer = document.getElementById(`apply-form-${jobId}`);
+    formContainer.style.display = 'none'; // Show the apply form
+    const closebtn = document.getElementById(`close-btn`);
+    closebtn.style.display = 'none'; // Show the apply form
+}

@@ -38,7 +38,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <?php echo '<img src="' .$user_image . '" alt="" />'; ?>
                 <div>
                    <h4 id="name"></h4>
-                    <a href="myprofile.php">See your profile</a>
+                    <a href="mypage.php">See your profile</a>
                 </div>
             </div>
             <hr>
