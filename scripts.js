@@ -548,6 +548,7 @@ document.addEventListener('DOMContentLoaded', function () {
         myname.innerHTML = data.institution[0].iname;
 })}
 
+
   if (pageType === "mypage") {
     let iid = getCookie("id");
 
@@ -589,7 +590,6 @@ document.addEventListener('DOMContentLoaded', function () {
         mycover.src = data.institution[0].icover;
         mytitle.innerHTML = String(data.institution[0].itype).charAt(0).toUpperCase() + String(data.institution[0].itype).slice(1);
         mydesc.innerHTML = data.institution[0].udescription;
-        //myname.innerHTML = data.institution[0].iname;
 
        
         // ADD MY POSTS

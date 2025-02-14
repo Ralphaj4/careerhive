@@ -147,9 +147,17 @@ function getUserData($id){
     $user = $result->fetch_assoc();
     $stmt->close();
     return $user;
+}
 
-    $userId = $_SESSION['user_id'] ?? null;
-    echo json_encode(['userId' => $userId]);
+function getInstData($id){
+    require('database.php');
+    $stmt = $conn->prepare("SELECT * FROM institutions WHERE iid = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+    $stmt->close();
+    return $user;
 }
 
 function handleTime($dateString) {
