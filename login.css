@@ -1,0 +1,162 @@
+/* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Body styling */
+body {
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* Container for the login form */
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-right: 35px;
+}
+
+
+/* Heading style */
+h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+    text-shadow: 3px 1px 1px rgb(0, 0, 0, 0.1);
+}
+
+/* Input field styling */
+.input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Button styling */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Error message styling */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+/* Register link styling */
+p {
+    margin-top: 25px;
+    font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+}
+
+/* a {
+    color: #007bff;
+    text-decoration: none;
+    margin-left: 100px;
+} */
+
+a:hover {
+    text-decoration: underline;
+}
+
+.text-container {
+    display: flex;
+    align-items: center;
+    gap: 75px; /* Space between text and button */
+}
+
+/* Transparent button styling */
+#register-btn {
+    background: none;
+    border: none;
+    color: blue;
+    font-size: inherit;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* Underline effect on hover */
+#register-btn:hover {
+    text-decoration: underline;
+}
+
+/* Menu Container (relative to keep dropdown positioned correctly) */
+.menu-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 150px; /* Fixed width for the dropdown */
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    padding: 0; /* Remove padding to prevent overflow */
+}
+
+/* Fix text alignment inside the menu */
+.dropdown-menu a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: black;
+    text-align: left; /* Align text to the left */
+    box-sizing: border-box; /* Include padding in the width calculation */
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Add ellipsis for overflow text */
+    width: 100%; /* Ensure the <a> tags take up the full width of the dropdown */
+}
+
+.dropdown-menu a:hover {
+    background-color: #f1f1f1;
+}
