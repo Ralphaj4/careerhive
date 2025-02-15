@@ -35,9 +35,29 @@ function getCookie(name) {
     return null;
 }
 
+function getInstCookie(name) {
+    let cookies = document.cookie.split('; ');
+    for (let cookie of cookies) {
+        let [key, value] = cookie.split('=');
+        if (key === name) {
+            return value;
+        }
+    }
+    return null;
+}
+
 function getDecodedCookie(name) {
     let encodedValue = getCookie(name);
     return encodedValue ? atob(encodedValue) : null;
+}
+
+function followPage(type, pageId){
+    fetch('a_uploadFollow.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: type, pid: pageId})
+    });
+    location.reload();
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -45,6 +65,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const userInputField = document.getElementById('userInput');
   const photoInput = document.getElementById('photoInput');
   const pageType = document.body.getAttribute('data-page');
+
+
 
   if (pageType === 'home') {
     document.getElementById('photoButton').addEventListener("click", function() {
@@ -200,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data); // Debugging: Check if jobs are received
+        //console.log(data);
         const jobsContainer = document.getElementById('jobs-container');
         jobsContainer.innerHTML = '';
         const pagesContainer = document.getElementById('pages-container');
@@ -210,13 +232,14 @@ document.addEventListener('DOMContentLoaded', function () {
             data.jobs.forEach((job) => {
                 const jobElement = document.createElement("div");
                 jobElement.classList.add("job");
+                jobElement.style.width = "95%"
                 jobElement.innerHTML = `
                     <div class="job-author">
-                        <a href="profile.php?id=${encodeURIComponent(btoa(job.jid))}">
+                        <a href="page.php?id=${job.iid}">
                             <img src="${job.iimage}" alt="">
                         </a>
                         <div>
-                            <a href="profile.php?id=${encodeURIComponent(btoa(job.jid))}" style="text-decoration: none; color: inherit;">
+                            <a href="page.php?id=${job.iid}" style="text-decoration: none; color: inherit;">
                                 <h1>${job.iname}</h1>
                             </a>
                             <small>${job.jtitle}</small>
@@ -226,8 +249,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     <p>${job.jdescription}</p>
                     <!-- Apply Button -->
                     <div class="btn-container">
-                    <button class="apply-btn" onclick="openApplyForm(${job.jid})">Apply</button>
-                    <button class="apply-btn" id="close-btn"onclick="closeApplyForm(${job.jid})" style="display:none;">Close</button>
+                        <button class="apply-btn ${job.applied === "applied" ? "disabled" : ""}" onclick="openApplyForm(${job.jid})" ${job.applied === "applied" ? "disabled" : ""}>${job.applied === "applied" ? "Applied" : "Apply"}</button>
+                        <button class="apply-btn" id="close-btn${job.jid}" onclick="closeApplyForm(${job.jid})" style="display:none;">Close</button>
                     </div>
                     <!-- Hidden Form for File Upload -->
                     <div class="apply-form-container" id="apply-form-${job.jid}" style="display:none;">
@@ -235,7 +258,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <label for="resume">Upload your resume (PDF):</label>
                             <input type="file" name="document" accept=".pdf" required />
                             <input type="hidden" name="job_id" value="${job.jid}" id="job-id-${job.jid}">
-                            <button type="submit">Submit Application</button>
+                            <button type="submit" id="submit-app">Submit Application</button>
                         </form>
                     </div>
                 `;
@@ -252,24 +275,13 @@ document.addEventListener('DOMContentLoaded', function () {
                             method: 'POST',
                             body: formData,
                         })
-                        .then(response => {
-                            console.log('Raw response:', response); // Log the raw response
-                            return response.json(); // Try to parse it as JSON
-                        })
+                        .then(response =>  response.json())
                         .then(data => {
-                            console.log(data); // Check the parsed data
-                            if (data.success) {
-                                alert("Application submitted successfully!");
-                                // Optionally, hide the form or update the UI
-                                document.getElementById(`apply-form-${jobId}`).style.display = 'none';
-                            } else {
-                                alert("There was an error submitting your application.");
-                            }
                         })
                         .catch(error => {
-                            console.error('Error:', error);
-                            alert("There was an error with the submission.");
-                        });
+                        }).finally(() => {
+                            location.reload();
+                        });;
                         
                     });
                 });
@@ -287,14 +299,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
             data.pages.forEach((page) => {
                 const pageElement = document.createElement("div");
-                pageElement.classList.add("job"); // Changed from "post" to "job"
+                pageElement.classList.add("page");
+                pageElement.style.paddingRight = "50px";
                 pageElement.innerHTML = `
-                    <div class="job-author">  <!-- Changed from "post-author" to "job-author" -->
-                        <a href="profile.php?id=${encodeURIComponent(btoa(page.jid))}">
+                    <div class="page-author">
+                        <a href="page.php?id=${page.iid}">
                             <img src="${page.iimage}" alt="">
                         </a>
                         <div>
-                            <a href="profile.php?id=${encodeURIComponent(btoa(page.jid))}" style="text-decoration: none; color: inherit;">
+                            <a href="page.php?id=${page.iid}" style="text-decoration: none; color: inherit;">
                                 <h1>${page.iname}</h1>
                             </a>
                             <small>${page.itype}</small>
@@ -314,10 +327,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if (pageType === "profile") {
     const urlParams = new URLSearchParams(window.location.search);
-    const profileUserId = atob(urlParams.get("id")); // Profile user ID from the URL
-    const rejectButton = document.getElementById("reject");
+    const profileUserId = atob(urlParams.get("id"));
 
     if (profileUserId) {
+        if(getInstCookie('inst')){
+            const profileBtnDiv = document.querySelector('.profile-btn');
+            if (profileBtnDiv) {
+                profileBtnDiv.style.display = 'none';
+            }
+        }
+        else{
         fetch(`a_getConnectionStatus.php?profileId=${profileUserId}`)
             .then(response => response.json())
             .then(data => {
@@ -325,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const connectButton = document.getElementById("primary-btn");
                 const rejectButton = document.getElementById("reject");
                 const connectImg = connectButton.querySelector("#connect-img"); // Select the image inside the button
-
+                
                 // Update the button based on the connection status
                 if (connectionStatus === 'pending') {
                     connectImg.src = "images/pending.png"; // Update image source to pending
@@ -348,6 +367,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
             .catch(error => console.error("Error fetching connection status:", error));
+        }
+
             fetch('a_fetchProfile.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -469,9 +490,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <div>
                                         <span>${post.comment_count} comments &middot; ${post.saved_count} saves</span>
                                     </div>
-                                </div>
-                                
-                                <div class="post-activity">
+                                </div>`;
+                                if(!getInstCookie('inst')){
+                                    postElement.innerHTML += `<div class="post-activity">
                                     <div>
                                         <img src="${post.uimage}" alt="" class="post-activity-user-icon">
                                         <img src="images/down-arrow.png" class="post-activity-arrow-icon">
@@ -507,6 +528,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                     </div>
                                 </div>
                             `;
+                                }
+                                
                     
                             postsContainer.appendChild(postElement);
                             count++;
@@ -653,21 +676,6 @@ document.addEventListener('DOMContentLoaded', function () {
 //     })
 //   }
 
-  if (pageType === "navbarInst") {
-    let iid = getCookie("id");
-
-    fetch('a_fetchMyPage.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: iid })
-    })
-    .then(response => response.json())
-    .then(data => {
-        const myname = document.getElementById('name');
-        myname.innerHTML = data.institution[0].iname;
-})}
-
-
   if (pageType === "mypage") {
     let iid = getCookie("id");
 
@@ -701,199 +709,72 @@ document.addEventListener('DOMContentLoaded', function () {
         const mytitle = document.getElementById('currentTitle');
         const mydesc = document.getElementById('description');
         const myname = document.querySelector('.profile-name');
+        const navbarName = document.getElementById('navname');
+        navbarName.textContent = data.institution[0].iname;
         myname.textContent = data.institution[0].iname;
-
+    
         // Set profile details
         myimage.src = data.institution[0].iimage;
         myimagepost.src = data.institution[0].iimage;
         mycover.src = data.institution[0].icover;
         mytitle.innerHTML = String(data.institution[0].itype).charAt(0).toUpperCase() + String(data.institution[0].itype).slice(1);
-        mydesc.innerHTML = data.institution[0].udescription;
-
-       
-        // ADD MY POSTS
-        const postsContainer = document.querySelector(".profile-post-container");
-        postsContainer.innerHTML = `<h2 style="margin-top: 20px;">Posts</h2>`;
-
-
-        if (data.posts.length > 0) {
-            let count = 1;
         
-            data.posts.forEach((post) => {
-                const postElement = document.createElement("div");
-                postElement.classList.add("post");
-                postElement.innerHTML = `
+        const jobsContainer = document.getElementById('jobs-container');
+        jobsContainer.innerHTML = '';
+    
+        if (data.jobs && data.jobs.length > 0) {
+            data.jobs.forEach((job) => {
+                const jobElement = document.createElement("div");
+                jobElement.classList.add("job");
+                jobElement.innerHTML = `
                 <div class="post-header">
-                    <div class="post-author">
-                        <a href="profile.php?id=${encodeURIComponent(btoa(post.iid))}">
-                            <img src="${post.uimage}" alt="">
-                        </a>
+                    <div class="job-author">
+                        <img src="${job.iimage}" alt="">
                         <div>
-                            <a href="profile.php?id=${encodeURIComponent(btoa(post.iid))}" style="text-decoration: none; color: inherit;">
-                                <h1>${post.iname}</h1>
-                            </a>
-                            <small>${post.itype}</small>
-                            <small>${formatTimeAgo(post.pcreation)}</small>
+                            <h1>${job.iname}</h1>
+                            <small>${job.jtitle}</small>
+                            <small>${formatTimeAgo(job.jcreation)}</small>
                         </div>
                     </div>
-                    <button class="delete-post" data-postid="${post.pid}">
-                        <img src="images/delete.png" alt="Delete">
-                    </button>
+                    <div class="job-actions">
+                        <button class="delete-job" data-jobid="${job.jid}">
+                            <img src="images/delete.png" alt="Delete">
+                        </button>
+                        <a href="applicants.php?id=${encodeURIComponent(btoa(job.jid))}"><button class="apply-btn" data-jobid="${job.jid}">View Applicants</button></a>
+                    </div>
                 </div>
-                    <p>${post.ptext}</p>
-                    ${post.pimage ? `<img src="${post.pimage}" alt="" width="100%" />` : ""}
-                    
-                    <div class="post-stats">
-                        <div>
-                            <img src="images/thumbsup.png">
-                            <img src="images/love.png">
-                            <img src="images/clap.png">
-                            <span class="liked-users">${post.like_count} likes</span>
-                        </div>
-                        <div>
-                            <span>${post.comment_count} comments &middot; ${post.saved_count} saves</span>
-                        </div>
-                    </div>
-                    
-                    <div class="post-activity">
-                        <div>
-                            <img src="${post.iimage}" alt="" class="post-activity-user-icon">
-                            <img src="images/down-arrow.png" class="post-activity-arrow-icon">
-                        </div>
-                        <div class="post-activity-link">
-                            <button id="like" class="like" onClick="toggleImage(0, ${post.pid})" data-postid="${post.pid}">
-                                <img src="images/${post.is_liked}.png" id="toggleImage${post.pid}">
-                                <span>Like</span>
-                            </button>
-                        </div>
-                        <div class="post-activity-link">
-                            <button id="showCommentBox${count}" class="comment-post" onClick="showComments(${count},${post.pid})" data-postid="${post.pid}">
-                                <img src="images/comment.png">
-                                <span>Comment</span>
-                            </button>
-                        </div>
-                        <div class="post-activity-link">
-                            <button onClick=toggleImage(1,${post.pid})><img src="images/${post.is_saved}.png" id="togglesave${post.pid}"><span>Save</span></button>
-                        </div>
-                        
-                        <div id="overlay${count}" class="overlay" style="display: none;"></div>
-                        <div id="whiteBox${count}" class="white-box" style="display: none;">
-                            <div>
-                                <button id="close-Comments" class="close-Comments" onClick="toggleVisibility(false, ${count}, 0)"><p>X</p></button>
-                            </div>
-                            <div class="comments-container" id="comments-container${count}">
-                                <p>Comments will appear here...</p>
-                            </div>
-                            <div>
-                                <textarea id="userComment${count}" class="userComment" name="userComment" rows="1" placeholder="Type a comment"></textarea>
-                                <button id="sendComment${post.pid}" class="sendComment" onClick="postComment(${count},${post.pid})"><img src="images/send.png"></button>
-                            </div>
-                        </div>
-                    </div>
+                <p>${job.jdescription}</p>
                 `;
-        
-                postsContainer.appendChild(postElement);
-                count++;
-            });
-
-            // Add event listener for deleting posts
-            document.querySelectorAll(".delete-post").forEach((btn) => {
-                btn.addEventListener("click", function () {
-                    const postId = this.getAttribute("data-postid");
-                    console.log(postId);
-                    fetch('a_deletePost.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({postId: postId})     
-                    })
-                });
+                jobsContainer.appendChild(jobElement);
             });
         } else {
-            postsContainer.innerHTML = '<div style="display:flex; align-items:center;justify-content: center;height: 70vh;"><h2>No Posts Found</h2></div>';
+            jobsContainer.innerHTML = '<div style="display:flex; align-items:center;justify-content: center;height: 70vh;"><h2>No Jobs Found</h2></div>';
         }
-        
-
+    
+        // Delete Job Event Listener
+        document.querySelectorAll(".delete-job").forEach((btn) => {
+            btn.addEventListener("click", function () {
+                const jobId = this.getAttribute("data-jobid");
+                console.log(jobId);
+                fetch('a_deleteJob.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({jobId: jobId})     
+                });
+                location.reload();
+            });
+        });
+    
+        // View Applicants Event Listener
+        document.querySelectorAll(".apply-btn").forEach((btn) => {
+            btn.addEventListener("click", function () {
+                const jobId = this.getAttribute("data-jobid");
+                console.log('job id: ', jobId);
+            });
+        });
+    
     })
     .catch(error => console.error('Error fetching profile:', error));
-
-    // document.body.addEventListener("click", (event) => {
-    //     if (event.target.id === "submit-language") {
-    //         const language = document.getElementById('language-name');
-    //         if (language.value) {
-    //             let lang = language.value;
-
-    //             fetch('a_uploadLanguage.php', {
-    //                 method: 'POST',
-    //                 headers: { 'Content-Type': 'application/json' },
-    //                 body: JSON.stringify({language: lang})
-    //             });
-    //             const newLanguage = {
-    //                 lname: lang
-    //             };
-    //             const langContainer = document.querySelector(".profile-language-container");
-    //             const popupContainerLang = document.querySelector(".language-popup-container");
-    //             const langp = document.createElement("p");
-    //             langp.classList.add("language");
-    //             langp.textContent = newLanguage.lname;
-    //             langContainer.appendChild(langp);
-    //             popupContainerLang.style.display = "none";
-    //         }
-    //     }
-    // });
-
-    // document.body.addEventListener("click", (event) => {
-    //     if (event.target.id === "submit-skill") {
-    //         const skill = document.getElementById('skill-name');
-    //         if (skill.value) {
-    //             let sk = skill.value;
-    //             fetch('a_uploadSkill.php', {
-    //                 method: 'POST',
-    //                 headers: { 'Content-Type': 'application/json' },
-    //                 body: JSON.stringify({ type: 1, skill: sk})
-    //             });
-
-    //             const newEducation = {
-    //                 skillname: sk
-    //             };
-    //             const skillsContainer = document.querySelector(".profile-skills-container");
-    //             const popupContainerSkill = document.querySelector(".skill-popup-container");
-    //             const skillp = document.createElement("p");
-    //             skillp.classList.add("skill");
-    //             skillp.textContent = newEducation.skillname;
-    //             skillsContainer.appendChild(skillp);
-    //             popupContainerSkill.style.display = "none";
-    //     }
-    //     }
-
-    //     // Handle skill deletion
-    //     if (event.target.classList.contains("delete-skill")) {
-    //         const skillElement = event.target.closest(".skill");
-    //         const skillName = skillElement.dataset.skillname;
-    //         //console.log(skillName);
-    //         fetch("a_uploadSkill.php", {
-    //             method: "POST",
-    //             headers: { "Content-Type": "application/json" },
-    //             body: JSON.stringify({ type: 0, skill: skillName })
-    //         });
-
-    //         skillElement.remove();
-    //     }
-
-    //     // Handle language deletion
-    //     if (event.target.classList.contains("delete-language")) {
-    //         const langElement = event.target.closest(".language");
-    //         const lname = langElement.dataset.lname;
-    //         //console.log(skillName);
-    //         fetch("a_uploadLanguage.php", {
-    //             method: "POST",
-    //             headers: { "Content-Type": "application/json" },
-    //             body: JSON.stringify({ type: 0, language: lname })
-    //         });
-
-    //         langElement.remove();
-    //     }
-    // });
-    
     
     fetch('a_fetchNews.php', {
         method: 'POST',
@@ -930,6 +811,105 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .catch(error => console.error('Error fetching news:', error));
   }
+  
+  if (pageType === "page") {
+    const urlParams = new URLSearchParams(window.location.search);
+    const pageId = atob(urlParams.get("id"));
+    
+    fetch(`a_getFollowStatus.php?id=${pageId}`)
+    .then(response => response.json())
+    .then(data => {
+        const followStatus = data.following;
+        const followBtn = document.getElementById("primary-btn");
+        const followImg = followBtn.querySelector("#follow-img"); // Select the image inside the button
+
+        // Update the button based on the connection status
+        if (!followStatus) {
+            followImg.src = "images/connect.png";
+            followBtn.querySelector("span").textContent = "Follow";
+            followBtn.setAttribute('onclick', 'followPage(1, ' + pageId + ')');
+        } else {
+            followImg.src = "images/connected.png";
+            followBtn.querySelector("span").textContent = "Following";
+            followBtn.setAttribute('onclick', 'followPage(0, ' + pageId + ')');
+        }
+    })
+    .catch(error => console.error("Error fetching connection status:", error));
+
+    fetch('a_fetchJobs.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pid: pageId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        //console.log(data);
+        const jobsContainer = document.getElementById('jobs-container');
+        jobsContainer.innerHTML = '';
+
+        if (data.jobs && data.jobs.length > 0) {
+            data.jobs.forEach((job) => {
+                const jobElement = document.createElement("div");
+                jobElement.classList.add("job");
+                jobElement.innerHTML = `
+                    <div class="job-author">
+                        <a href="page.php?id=${job.iid}">
+                            <img src="${job.iimage}" alt="">
+                        </a>
+                        <div>
+                            <a href="page.php?id=${job.iid}" style="text-decoration: none; color: inherit;">
+                                <h1>${job.iname}</h1>
+                            </a>
+                            <small>${job.jtitle}</small>
+                            <small>${formatTimeAgo(job.jcreation)}</small>
+                        </div>
+                    </div>
+                    <p>${job.jdescription}</p>
+                    <!-- Apply Button -->
+                    <div class="btn-container">
+                        <button class="apply-btn ${job.applied === "applied" ? "disabled" : ""}" onclick="openApplyForm(${job.jid})" ${job.applied === "applied" ? "disabled" : ""}>${job.applied === "applied" ? "Applied" : "Apply"}</button>
+                        <button class="apply-btn" id="close-btn${job.jid}" onclick="closeApplyForm(${job.jid})" style="display:none;">Close</button>
+                    </div>
+                    <!-- Hidden Form for File Upload -->
+                    <div class="apply-form-container" id="apply-form-${job.jid}" style="display:none;">
+                        <form id="apply-form-${job.jid}-form" enctype="multipart/form-data">
+                            <label for="resume">Upload your resume (PDF):</label>
+                            <input type="file" name="document" accept=".pdf" required />
+                            <input type="hidden" name="job_id" value="${job.jid}" id="job-id-${job.jid}">
+                            <button type="submit" id="submit-app">Submit Application</button>
+                        </form>
+                    </div>
+                `;
+                jobsContainer.appendChild(jobElement);
+                const applyForms = document.querySelectorAll('.apply-form-container form');
+                applyForms.forEach(form => {
+                    form.addEventListener('submit', function(event) {
+                        event.preventDefault(); // Prevent the default form submission
+
+                        const formData = new FormData(form);
+                        const jobId = formData.get('jid');
+                        
+                        fetch('a_applyJob.php', {
+                            method: 'POST',
+                            body: formData,
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                        })
+                        .catch(error => {})
+                        .finally(() => {
+                            location.reload();
+                        });
+                        
+                    });
+                });
+
+            });
+        } else {
+            jobsContainer.innerHTML = '<div style="display:flex; align-items:center;justify-content: center;height: 70vh;"><h2>No Jobs Found</h2></div>';
+        }
+  });
+}
 
   if (pageType === "myprofile") {
     let uid = getCookie("id");
@@ -1513,6 +1493,87 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
 
+  if(pageType === "applicants"){
+    const urlParams = new URLSearchParams(window.location.search);
+    const jobId = atob(urlParams.get("id"));
+    fetch(`a_fetchApplicants.php?id=${jobId}`)
+    .then(response => response.json())
+    .then(data => {
+        const appContainer = document.querySelector(".applicants-container"); 
+        if (!appContainer) {
+            console.error("Error: .applicants-container not found!");
+            return;
+        }
+
+        const headerJob = document.getElementById('job-header');
+        if (headerJob && data.job.length > 0) {
+            headerJob.textContent += data.job[0].jtitle;
+        } else {
+            console.error("Error: #job-header not found or job data is empty!");
+        }
+
+        data.applications.forEach((app) => {
+                const appDiv = document.createElement("div");
+                appDiv.classList.add("profile-card");
+                appDiv.style.backgroundColor = "white";
+        
+                const profileLink = document.createElement("a");
+                profileLink.href = `profile.php?id=${app.uid}`;
+                profileLink.classList.add("profile-link");
+        
+                if (app.uimage) {
+                    const imageTag = document.createElement("img");
+                    imageTag.src = app.uimage;
+                    imageTag.alt = "User Image";
+                    imageTag.classList.add("profile-img");
+                    appDiv.appendChild(imageTag);
+                }
+        
+                const name = document.createElement("h3");
+                name.textContent = `${app.ufname} ${app.ulname}`;
+        
+                const title = document.createElement("p");
+                title.textContent = `Title: ${app.utitle || 'No Title'}`;
+        
+                const mail = document.createElement("p");
+                mail.textContent = `Email : ${app.uemail || 'No about'}`;
+                
+                // Job Actions Div
+                const jobActionsDiv = document.createElement("div");
+                jobActionsDiv.classList.add("job-actions");
+
+                // Create anchor tag for document link
+                const docLink = document.createElement("a");
+                docLink.href = `http://localhost/careerhive/uploads/${app.document}`;
+                docLink.target = "_blank"; // Opens in a new tab
+                docLink.classList.add("document-link");
+
+                const emailTo = document.createElement("a");
+                emailTo.href = `mailto:${app.uemail}`;
+
+                // Create View Document Button inside anchor
+                const viewButton = document.createElement("button");
+                viewButton.classList.add("apply-btn");
+                viewButton.textContent = "View Document";
+
+                // Append button inside anchor
+                docLink.appendChild(viewButton);
+                jobActionsDiv.appendChild(docLink);
+                emailTo.appendChild(mail);
+                // Append elements
+                appDiv.appendChild(name);
+                appDiv.appendChild(title);
+                appDiv.appendChild(emailTo);
+                appDiv.appendChild(jobActionsDiv);
+                
+                profileLink.appendChild(appDiv);
+                appContainer.appendChild(profileLink);
+        });
+    });
+
+
+  }
+
   if(pageType === "network"){
     fetch('a_fetchNetwork.php', {
       method: 'POST',
@@ -1531,6 +1592,7 @@ document.addEventListener('DOMContentLoaded', function () {
             profiles.forEach(profile => {
                 const profileDiv = document.createElement("div");
                 profileDiv.classList.add("profile-card");
+                profileDiv.style.backgroundColor = "white";
         
                 const profileLink = document.createElement("a");
                 profileLink.href = `profile.php?id=${profile.uid}`;
@@ -1574,6 +1636,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Create the profile card div
                 const profileDiv = document.createElement("div");
                 profileDiv.classList.add("profile-card");
+                profileDiv.style.backgroundColor = "white";
         
                 // Create the anchor element
                 const profileLink = document.createElement("a");
@@ -1616,11 +1679,11 @@ document.addEventListener('DOMContentLoaded', function () {
             incomings.forEach(incoming => {
                 const profileDiv = document.createElement("div");
                 profileDiv.classList.add("profile-card");
-        
+                profileDiv.style.backgroundColor = "white";
                 // Create an anchor element
                 const profileLink = document.createElement("a");
                 profileLink.href = `profile.php?id=${incoming.uid}`;
-                profileLink.classList.add("profile-link"); // Optional CSS class
+                profileLink.classList.add("profile-link");
         
                 // Create an image element if the profile has an image
                 if (incoming.uimage) {
@@ -1675,21 +1738,23 @@ document.addEventListener('DOMContentLoaded', function () {
       if(file) {
           formData.append('photoInput', file);
       }
-
-      fetch('a_uploadPost.php', {
-          method: 'POST',
-          body: formData, // Send FormData with text and image
-      })
-      .then((response) => response.text())
-      .then((data) => {
-          //console.log("Upload successful:", data);
-          setTimeout(() => {
-              window.location.reload(); // Reload the page
-          }, 100);
-      })
-      .catch((error) => {
-          console.error("Error:", error);
-      });
+      if(userInput){
+        fetch('a_uploadPost.php', {
+            method: 'POST',
+            body: formData, // Send FormData with text and image
+        })
+        .then((response) => response.text())
+        .then((data) => {
+            //console.log("Upload successful:", data);
+            setTimeout(() => {
+                window.location.reload(); // Reload the page
+            }, 100);
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+      }
+      
   });
 });
 
@@ -2153,40 +2218,40 @@ document.addEventListener("DOMContentLoaded", function () {
 //     .catch(error => console.error('Error during application submission:', error));
 // }
 
-document.querySelector("#apply-form-" + jobId + "-form").addEventListener("submit", function(e) {
-    e.preventDefault(); // Prevent default form submission
+// document.querySelector("#apply-form-" + jobId + "-form").addEventListener("submit", function(e) {
+//     e.preventDefault(); // Prevent default form submission
 
-    // Disable the button to prevent double submission
-    var submitButton = document.querySelector("#apply-form-" + jobId + "-form button");
-    submitButton.disabled = true;
+//     // Disable the button to prevent double submission
+//     var submitButton = document.querySelector("#apply-form-" + jobId + "-form button");
+//     submitButton.disabled = true;
 
-    // Prepare the form data
-    var formData = new FormData(this);
+//     // Prepare the form data
+//     var formData = new FormData(this);
 
-    // Send the AJAX request
-    fetch('a_applyJob.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Handle success (show success message)
-            alert("Application submitted successfully!");
-        } else {
-            // Handle error (show error message)
-            alert("There was an error with the submission: " + data.message);
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("There was an error with the submission");
-    })
-    .finally(() => {
-        // Re-enable the button after the request completes
-        submitButton.disabled = false;
-    });
-});
+//     // Send the AJAX request
+//     fetch('a_applyJob.php', {
+//         method: 'POST',
+//         body: formData
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             // Handle success (show success message)
+//             alert("Application submitted successfully!");
+//         } else {
+//             // Handle error (show error message)
+//             alert("There was an error with the submission: " + data.message);
+//         }
+//     })
+//     .catch(error => {
+//         console.error("Error:", error);
+//         alert("There was an error with the submission");
+//     })
+//     .finally(() => {
+//         // Re-enable the button after the request completes
+//         submitButton.disabled = false;
+//     });
+// });
 
 
 // Add this listener to your form
@@ -2196,7 +2261,7 @@ form.addEventListener('submit', (event) => handleApplyFormSubmit(event, jobId));
 function openApplyForm(jobId) {
     const formContainer = document.getElementById(`apply-form-${jobId}`);
     formContainer.style.display = 'block'; // Show the apply form
-    const closebtn = document.getElementById(`close-btn`);
+    const closebtn = document.getElementById(`close-btn`+jobId);
     closebtn.style.display = 'block'; // Show the apply form
 }
 
@@ -2204,6 +2269,6 @@ function openApplyForm(jobId) {
 function closeApplyForm(jobId) {
     const formContainer = document.getElementById(`apply-form-${jobId}`);
     formContainer.style.display = 'none'; // Show the apply form
-    const closebtn = document.getElementById(`close-btn`);
+    const closebtn = document.getElementById(`close-btn`+jobId);
     closebtn.style.display = 'none'; // Show the apply form
 }

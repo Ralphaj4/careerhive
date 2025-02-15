@@ -5,17 +5,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $input = json_decode(file_get_contents('php://input'), true);
     $id = $input['id'] ?? null;
     $stmt = $conn->prepare("SELECT 
-    jobs.jid,
-    jobs.jtitle,
-    jobs.jdescription,
-    jobs.jcreation
-FROM 
-    jobs
-WHERE 
-    jobs.iid = ?
-ORDER BY
-    jobs.jcreation DESC;
-");
+        jobs.jid, 
+        jobs.jtitle, 
+        jobs.jdescription, 
+        jobs.jcreation,
+        institutions.iname, 
+        institutions.iimage,
+        institutions.iid
+    FROM 
+        jobs 
+    JOIN 
+        institutions ON jobs.iid = institutions.iid 
+    WHERE 
+        institutions.iid = ?
+    ORDER BY
+        jobs.jcreation DESC");
 
     $stmt->bind_param("i", $id);
     if (!$stmt->execute()) {

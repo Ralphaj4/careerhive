@@ -1,6 +1,14 @@
 <?php 
 session_start();
-require('navbar.php'); ?>
+require('database.php');
+require('functions.php');
+require('navbar.php');
+
+$connections = getConnectionCount(base64_decode($_COOKIE["id"]));
+$applications = getApplicationCount(base64_decode($_COOKIE["id"]));
+$following = getFollowingCount(base64_decode($_COOKIE["id"]));
+
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,10 +21,61 @@ require('navbar.php'); ?>
     <title>CareerHive</title>
 </head>
 <body>
+<div class="container">
+    <div class="left-sidebar">
+        <div class="sidebar-profile-box">
+         <?php echo '<img src="' . $_SESSION['ucover'] . '" alt="" width="100%" class="cover-home"> ' ?><!---- hon fina n7ot l cover pic lal user l howe bina2iha---->
+            <div class="sidebar-profile-info">
+                <?php echo '<img src="' . $_SESSION['uimage'] . '" alt="" />'; ?>    <!---- hon fina n7ot soret l user l 3amel login ---->
+                <?php echo '<a href="myprofile.php" style="text-decoration: none; color: inherit;"><h1>'.$_SESSION["fname"]. " ".$_SESSION["lname"].'</h1></a>'?>
+                <?php echo '<h3>'.$_SESSION["title"].'</h3>'?>
+                <ul>
+                    <?php echo '<li>Your followings<span>'.$following.'</span></li>' ?>
+                    <?php echo '<li>Your applications<span>'.$applications.'</span></li>' ?>
+                    <?php echo '<li> Your connections<span>'. $connections . '</span></li>' ?>
+                </ul>
+            </div>
+            <div class="sidebar-profile-link">
+                <a href="myitems.php"><img src="images/items.png">My items</a>
+                <a href="#"><img src="images/premium.png">Post ad</a> <!---- hon hiye l panel l 3al yamin l 5asa bel ads mn5aliha eza 7ada 3ml add ad byn7at sorto 3al yamin w sho bado y3ml post ----->
+            </div>
+        </div>
+        <div class="sidebar-activity">
+            <h3>RECENT</h3>
+            <a href="#"><img src="images/recent.png">First Recent</a>  <!----kl ho l recent kamen badna nshuf l db eza bdna na3malon aw la2 ----->
+            <a href="#"><img src="images/recent.png">Second Recent</a>
+            <a href="#"><img src="images/recent.png">Third Recent</a>
+            <a href="#"><img src="images/recent.png">Fourth Recent</a>
+            <h3>Groups</h3>
+            <a href="#"><img src="images/group.png">First Group</a>  <!----- hon nfs fkrt l recents kamen badna nshuf eza mn3mila 7asab l ds ---->
+            <a href="#"><img src="images/group.png">Second Group</a>
+            <a href="#"><img src="images/group.png">Third Group</a>
+            <a href="#"><img src="images/group.png">Fourth Group</a>
+            <div class="discover-more-link">
+            <h3><a href="#">Discover More</a></h3>
+            </div>
+        </div>
+    </div>
+    <div class="main-content">
+        <h2>Search Results</h2>
+        <div id="resultsContainer" style="width: 100%;"></div> 
+    </div>
 
-    <h2>Search Results</h2>
-    <div id="resultsContainer"></div> <!-- Placeholder for search results -->
-
+    <div class="right-sidebar">
+        <div class="sidebar-news" id="sidebar-news">
+            <h3>Trending News</h3>
+            <div class="spinner-container">
+                <div class="spinner"></div>
+            </div>
+        </div>
+        <div class="sidebar-useful-links">
+            <div class="copyright-msg">
+            <img src="images/logo.png">
+            <p>CareerHive &#169; 2025. All rights reserved</p>
+            </div>
+        </div>
+    </div>
+</div>
     <script>
         function getCookie(name) {
             let cookies = document.cookie.split('; ');
@@ -70,7 +129,8 @@ require('navbar.php'); ?>
             searchResults.profiles.forEach(profile => {
                 if (String(atob(decodeURIComponent(profile.uid))).trim() !== String(cookieid).trim()) { 
                 const profileDiv = document.createElement("div");
-                profileDiv.classList.add("profile-card"); 
+                profileDiv.classList.add("profile-card");
+                profileDiv.style.backgroundColor = "white";
                 
                 let imageTag = "";
                 if (profile.uimage) {

@@ -3,10 +3,14 @@ if(!isset($_COOKIE['id'])){
     header("Location: index.php");
     exit;
 }
+if(isset($_COOKIE['inst'])){
+    header("Location: index.php");
+    exit;
+}
 if (isset($_GET['id'])) {
     require('functions.php');
     $user = getInstData(base64_decode($_GET['id']));
-    $connections = getEmployeeCount(base64_decode($_GET["id"]));
+    $employees = getEmployeeCount(base64_decode($_GET["id"]));
 }
 ?>
 
@@ -23,6 +27,7 @@ if (isset($_GET['id'])) {
 <body data-page="page">
     
 <?php 
+session_start();
 if(!isset($_COOKIE['inst'])){
     include('navbar.php');
 }
@@ -41,47 +46,56 @@ echo '
                 <b>' . htmlspecialchars($user['itype']) . '</b>
                 <div class="mutual-connections">
                     <img src="' . htmlspecialchars($user['iimage']) . '" alt="Profile Image">
-                    <span>' . htmlspecialchars($connections) . ' connections</span>
+                    <span>' . htmlspecialchars($employees) . ' employees</span>
                 </div>'; 
 ?>
 
 <?php if (!isset($_COOKIE['inst'])) { ?>
     <div class="profile-btn">
-        <button class="primary-btn" id="primary-btn" onclick="sendConnectionInProfile()">
-            <img src="images/connect.png" alt="Connect Icon" id="connect-img">
-            <span>Reject</span>
-        </button>
-        <button class="primary-btn" id="reject" onclick="sendConnectionInProfile(0)" style="display: none;">
-            <img src="images/x.png" alt="Connect Icon" id="reject-img">
-            <span>Connect</span>
-        </button>
-        <button>
-            <img src="images/chat.png" alt="Chat Icon"> Message
+        <button class="primary-btn" id="primary-btn" onclick="followPage()">
+            <img src="images/connect.png" alt="Connect Icon" id="follow-img">
+            <span>Follow</span>
         </button>
     </div>
 <?php } ?>
 
-<?php
-echo '
+
+    </div>
+        </div>
+        <h2 style="margin-top: 20px; margin-left:10px;">Jobs</h2>
+
+    <div class="jobs-container">
+        <div class="jobs-wrapper" id="jobs-container" style="flex-basis: 100%; overflow-x: hidden;">
+            <div class="spinner-container">
+                <div class="spinner"></div>
             </div>
         </div>
-        
-        <div class="profile-experience-container"></div>
-        <div class="profile-education-container"></div>
-        <div class="profile-skills-container"></div>
-        <div class="profile-language-container"></div>
-        <div class="profile-post-container"></div>
+    </div>
+
+    <!-- Modal or Apply Form (optional) -->
+    <div id="apply-form-container" style="display:none;">
+        <!-- This container can hold a global form for applications if needed -->
+    </div>
         <div class="profile-sidebar"></div>
 
     </div>
     
     <div class="profile-sidebar">
-        <div class="sidebar-news" id="sidebar-news">
+    <div class="sidebar-news" id="sidebar-news">
             <h3>Trending News</h3>
+            <div class="spinner-container">
+                <div class="spinner"></div>
+            </div>
+        </div>
+        <div class="sidebar-useful-links">
+            <div class="copyright-msg">
+            <img src="images/logo.png">
+            <p>CareerHive &#169; 2025. All rights reserved</p>
+            </div>
         </div>
     </div>
 </div>
 
 <script src="scripts.js"></script>
-';
-?>
+</body>
+</html>

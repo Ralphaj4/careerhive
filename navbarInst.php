@@ -23,7 +23,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
 <nav class="navbar">
     <div class="navbar-left">
-    <a href="home.php" class="logo"><img src="images/logo.png"></a>
+    <a href="" class="logo"><img src="images/logo.png"></a>
     </div>
     <div class="navbar-right" style="margin-left:95%">
         <div class="online">
@@ -37,7 +37,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <div class="user-info">
                 <?php echo '<img src="' .$user_image . '" alt="" />'; ?>
                 <div>
-                   <h4 id="name"></h4>
+                   <h4 id="navname"></h4>
                     <a href="mypage.php">See your profile</a>
                 </div>
             </div>

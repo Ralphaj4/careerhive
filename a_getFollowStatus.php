@@ -3,7 +3,7 @@ require('database.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $userId = base64_decode($_COOKIE['id']);
-    $pageId = $_GET['pageId'];
+    $pageId = $_GET['id'];
 
     if (!$userId || !$pageId) {
         echo json_encode(['success' => false, 'error' => 'Invalid input']);

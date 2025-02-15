@@ -2,7 +2,7 @@
 require('database.php');
 // Ensure that the user is authenticated (replace with your authentication logic)
 session_start(); // Start the session
-$userId = $_COOKIE['id']; // Get user ID from session
+$userId = base64_decode($_COOKIE['id']); // Get user ID from session
 
 if ($userId === null) {
     echo json_encode(['success' => false, 'message' => 'User not authenticated.']);
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        if ($fileSize > 5 * 1024 * 1024) { // Max file size 5MB
+        if ($fileSize > 15 * 1024 * 1024) { // Max file size 5MB
             echo json_encode(['success' => false, 'message' => 'File size exceeds the limit (5MB).']);
             exit();
         }
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (move_uploaded_file($fileTmpName, $fileDestination)) {
             // Insert file information into the database using mysqli
             $stmt = $conn->prepare("INSERT INTO applications (jid, uid, document) VALUES (?, ?, ?)");
-            $stmt->bind_param("iis", $jobId, $userId, $fileNewName); // "iis" means integer, integer, string
+            $stmt->bind_param("iis", $jobId, $userId, $fileNewName);
             $stmt->execute();
 
             if ($stmt->affected_rows > 0) {
@@ -58,8 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $stmt->close(); // Close the statement
-        } else {
-            echo json_encode(['success' => false, 'message' => 'There was an error uploading the file.']);
         }
     } else {
         echo json_encode(['success' => false, 'message' => 'No file uploaded or error during upload.']);

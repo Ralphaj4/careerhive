@@ -69,10 +69,14 @@
 </html>
 
 <?php
-if (isset($_COOKIE["id"])) {
+if (isset($_COOKIE["id"]) && !isset($_COOKIE['inst'])) {
     header("refresh:3;home.php");
     exit;
-} else {
+} else if (isset($_COOKIE["id"]) && isset($_COOKIE['inst'])) {
+    header("refresh:3;mypage.php");
+    exit;
+} 
+else {
     header("refresh:3;login.php");
     exit;
 }

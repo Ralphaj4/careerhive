@@ -25,7 +25,14 @@ $connections = getConnectionCount(base64_decode($_GET["id"]));
 </head>
 <body data-page="profile">
     
-<?php include('navbar.php');
+<?php 
+if(isset($_COOKIE['inst'])){
+    include('navbarInst.php');
+}
+else{
+    include('navbar.php');
+}
+
 echo '
 <div class="container">
     <div class="profile-main">
@@ -82,6 +89,16 @@ echo '
     <div class="profile-sidebar">
         <div class="sidebar-news" id="sidebar-news">
             <h3>Trending News</h3>
+            <div class="spinner-container">
+                <div class="spinner"></div>
+            </div>
+        </div>
+        
+        <div class="sidebar-useful-links">
+            <div class="copyright-msg">
+            <img src="images/logo.png">
+            <p>CareerHive &#169; 2025. All rights reserved</p>
+            </div>
         </div>
     </div>
 </div>

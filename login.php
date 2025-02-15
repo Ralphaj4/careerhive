@@ -47,9 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $getUID->close();
                     $cookieExpire = time() + (60 * 24 * 60 * 60);
                     setcookie("id",base64_encode($uid), $cookieExpire, "/");
-                    $_SESSION["fname"] = $user["fname"];
-                    $_SESSION["lname"] = $user["lname"];
-                    $_SESSION["uemail"] = $email;
                     header("Location: home.php");
                     exit;
                 }

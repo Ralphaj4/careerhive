@@ -37,6 +37,28 @@ function getConnectionCount($id){
         return $connection_count;
     }
 }
+function getFollowingCount($id){
+    require('database.php');
+    $getcount = $conn->prepare("SELECT COUNT(*) AS following_count FROM follow WHERE fusers = ?");
+    $getcount->bind_param("i", $id);
+    if($getcount->execute()){
+        $getcount->bind_result($following_count);
+        $getcount->fetch();
+        $getcount->close();
+        return $following_count;
+    }
+}
+function getApplicationCount($id){
+    require('database.php');
+    $getcount = $conn->prepare("SELECT COUNT(*) AS application_count FROM applications WHERE uid = ?");
+    $getcount->bind_param("i", $id);
+    if($getcount->execute()){
+        $getcount->bind_result($application_count);
+        $getcount->fetch();
+        $getcount->close();
+        return $application_count;
+    }
+}
 
 function getEmployeeCount($id){
     require('database.php');
@@ -49,6 +71,7 @@ function getEmployeeCount($id){
         return $employee_count;
     }
 }
+
 
 function InsertNotification($sender, $receiver, $type, $postid){
     require('database.php');

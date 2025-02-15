@@ -2,7 +2,7 @@
 use NewsdataIO\NewsdataApi;
 header('Content-Type: application/json');
 //CHANGED TO GET => Change to POST when needed
-if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     require_once 'vendor/autoload.php';
 

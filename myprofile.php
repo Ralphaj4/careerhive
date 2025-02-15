@@ -109,6 +109,15 @@ $connections = getConnectionCount($userId);
     <div class="profile-sidebar">
         <div class="sidebar-news" id="sidebar-news">
             <h3>Trending News</h3>
+            <div class="spinner-container">
+                <div class="spinner"></div>
+            </div>
+        </div>
+        <div class="sidebar-useful-links">
+            <div class="copyright-msg">
+            <img src="images/logo.png">
+            <p>CareerHive &#169; 2025. All rights reserved</p>
+            </div>
         </div>
     </div>
     

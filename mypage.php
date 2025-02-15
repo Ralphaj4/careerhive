@@ -61,7 +61,7 @@ $employees = getEmployeeCount($userId);
         </div>
     </div>
     
-    <h2 style="margin-bottom: 25px;">Posts</h2>
+    <h2 style="margin-bottom: 25px;">Jobs</h2>
     <form id="textForm" method="post" enctype="multipart/form-data">
     <div class="create-post">
         <div class="create-post-input">
@@ -79,18 +79,34 @@ $employees = getEmployeeCount($userId);
     </div>
 </form>
 
+<h2 style="margin-top: 20px; margin-left:10px;">Jobs</h2>
 
-
-    <div class="profile-post-container">
+<div class="post-header">
+    <div class="jobs-container">
+        <div class="jobs-wrapper" id="jobs-container" style="flex-basis: 100%; overflow-x: hidden;">
+            <div class="spinner-container">
+                <div class="spinner"></div>
+            </div>
+        </div>
     </div>
 </div>
 
+
+
+</div>
 <div class="profile-sidebar">
-        <div class="sidebar-news" id="sidebar-news">
+<div class="sidebar-news" id="sidebar-news">
             <h3>Trending News</h3>
+            <div class="spinner-container">
+                <div class="spinner"></div>
+            </div>
         </div>
-    </div>
-    
+        <div class="sidebar-useful-links">
+            <div class="copyright-msg">
+            <img src="images/logo.png">
+            <p>CareerHive &#169; 2025. All rights reserved</p>
+            </div>
+        </div>
 </div>
 
     

@@ -4,10 +4,8 @@ require_once('functions.php');
 mysqli_set_charset($conn, 'utf8mb4');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Decode the JSON input sent by fetch()
     $input = json_decode(file_get_contents("php://input"), true);
     
-    // Validate JSON input
     if (!$input) {
         header('Content-Type: application/json');
         echo json_encode(["error" => "Invalid JSON input"]);
